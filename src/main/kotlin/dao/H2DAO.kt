@@ -1,6 +1,9 @@
 package dao
 
-class H2DAO<T>: DAO<T> {
+import h2DS
+import javax.sql.DataSource
+
+class H2DAO<T>(ds: DataSource): DAO<T> {
 
     override fun create(): T {
         TODO("Not yet implemented")

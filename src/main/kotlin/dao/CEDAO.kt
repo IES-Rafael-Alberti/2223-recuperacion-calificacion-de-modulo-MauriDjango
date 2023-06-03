@@ -1,9 +1,9 @@
 package dao
 
-import dataSource.dataSource
 import entities.CE
 
-class CEDAO(dataSource: dataSource): DAO<CE> {
+
+class CEDAO(): DAO<CE> {
 
     override fun create(): CE {
         TODO("Not yet implemented")
@@ -20,5 +20,4 @@ class CEDAO(dataSource: dataSource): DAO<CE> {
     override fun deleteById(): CE {
         TODO("Not yet implemented")
     }
-
 }

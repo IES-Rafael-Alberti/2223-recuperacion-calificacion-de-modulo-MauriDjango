@@ -22,3 +22,5 @@ class HikariDataSource(): Source<DataSource>() {
     }
 }
 
+val h2DS = HikariDataSource().dataSource
+

@@ -4,6 +4,7 @@ import entities.UD
 
 
 class UDDAO(): DAO<UD> {
+
     override fun create(): UD {
         TODO("Not yet implemented")
     }
