@@ -1,6 +1,6 @@
 package dto
 
-import bingo.inputoutput.dataSource.file.ModCSVFile
+import csvFile.ModCSVFile
 import bingo.inputoutput.exceptions.log.Logging
 import exceptions.DTOAssemblyError
 import java.lang.Exception
@@ -14,23 +14,25 @@ class ModDTO(
     val ceGroup: List<String>,
     val ce: List<String>,
     val gradeSection: List<List<String>>
-): DTO()
-
-object AssembleModDTO {
-    fun assemble(modulo: String, modCSVFile: ModCSVFile): ModDTO {
-        return try {
-            ModDTO(
-                modulo = modulo,
-                students = modCSVFile.getStudents(),
-                ra = modCSVFile.getRA(),
-                ceGroup = modCSVFile.getCEGroups(),
-                ce = modCSVFile.getCEs(),
-                gradeSection = modCSVFile.getGradeSection()
-            )
-        } catch (e: Exception) {
-            logger.warnLog(e.message)
-            throw DTOAssemblyError
+): DTO() {
+    companion object{
+        fun assemble(modulo: String, modCSVFile: ModCSVFile): ModDTO {
+            return try {
+                ModDTO(
+                    modulo = modulo,
+                    students = modCSVFile.getStudents(),
+                    ra = modCSVFile.getRA(),
+                    ceGroup = modCSVFile.getCEGroups(),
+                    ce = modCSVFile.getCEs(),
+                    gradeSection = modCSVFile.getGradeSection()
+                )
+            } catch (e: Exception) {
+                logger.warnLog(e.message)
+                throw DTOAssemblyError
+            }
         }
     }
 }
+
+
 

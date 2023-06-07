@@ -1,7 +1,6 @@
-package bingo.inputoutput.dataSource.file
+package csvFile
 
 import bingo.inputoutput.exceptions.log.Logging
-import dto.ModDTO
 import bingo.inputoutput.exceptions.FileEmpty
 import exceptions.*
 import java.io.File
@@ -11,7 +10,7 @@ import java.lang.StringBuilder
 
 
 //TODO temporary... Later on filePath will be passed as Main Argument
-val file = getCSVFile("../files/UD1.csv")
+val file = getCSVFile("src/files/UD1.csv")
 val modCsvFile = ModCSVFile(file)
 
 
@@ -19,7 +18,6 @@ class ModCSVFile(csvFile: File){
     private var lines: List<String>
     private val logger = Logging("CSVDAO")
     private val linesList: MutableList<MutableList<String>>
-    val modDTO: ModDTO? = null
 
     init {
         lines = csvFile.readLines()
@@ -27,59 +25,7 @@ class ModCSVFile(csvFile: File){
         linesList = linesToList()
     }
 
-    fun getStudents(): MutableList<String> {
-        val studentList = mutableListOf<String>()
-        lines[1].trim(',').split(',').forEach() {
-            if (it != ",") studentList.add(it)
-        }
-        if (studentList.isEmpty()) throw StudentsNotFound
-        return studentList
-    }
-
-    fun getRA(): Int? {
-        val raRegex = Regex("RA(\\d{1})")
-        var ra: Int? = null
-
-        lines.forEach { line ->
-            val match = raRegex.find(line)
-
-            match?.groupValues?.get(1).let {
-                if (ra != null) throw RADetectedTwice
-                ra = it?.toInt()
-            }
-        }
-        if (ra == null) throw NoRAFound
-
-        return ra
-    }
-
-    fun getCEGroups(): List<String> {
-        val ceGroupRegex = Regex("([a-z],)+[a-z]")
-        val ceGroupList = mutableListOf<String>()
-
-        lines.forEach() { line ->
-            val match = ceGroupRegex.find(line)
-            match?.let { matchResult -> ceGroupList.add(matchResult.toString()) }
-        }
-
-        if (ceGroupList.isEmpty()) throw CENotFound
-        return ceGroupList
-    }
-
-    fun getCEs(): List<String> {
-        val ceRegex = Regex("UD\\d*\\.([a-z])")
-        val ceList = mutableListOf<String>()
-
-        lines.forEach() {line ->
-            val match = ceRegex.find(line)
-            match?.groupValues?.get(1)?.let { it1 -> ceList.add(it1) }
-        }
-
-        if (ceList.isEmpty()) throw CENotFound
-        return ceList
-    }
-
-    fun linesToList(): MutableList<MutableList<String>> {
+    private fun linesToList(): MutableList<MutableList<String>> {
         val allLines: MutableList<MutableList<String>> = mutableListOf()
         val lineListed: MutableList<String> = mutableListOf()
         val string = StringBuilder()
@@ -98,12 +44,70 @@ class ModCSVFile(csvFile: File){
                     quotesOpen = !quotesOpen
                 }
                 else
-                    string.append((char))
+                    string.append(char)
             }
-            allLines.add(lineListed)
+            allLines.add(lineListed.toMutableList())
+            lineListed.clear()
         }
         if (allLines.isEmpty()) throw LinesToListError
         return allLines
+    }
+
+    fun getStudents(): MutableList<String> {
+        val studentList = mutableListOf<String>()
+        val firstStudentIndex: Int?
+
+        firstStudentIndex = lines[0].split(',').indexOfFirst { it != "" }
+
+        lines[1].split(',').drop(firstStudentIndex).forEach() {
+            if (it != ",") studentList.add(it)
+        }
+
+        if (studentList.isEmpty()) throw StudentsNotFound
+        return studentList
+    }
+
+    fun getRA(): Int? {
+        val raRegex = Regex("RA(\\d{1})")
+        var ra: Int? = null
+
+        lines.forEach { line ->
+            val match = raRegex.find(line)
+
+            match?.groupValues?.get(1)?.let {
+                if (ra != null && ra != it.toInt()) throw RADetectedTwice
+                ra = it.toInt()
+            }
+        }
+        if (ra == null) throw NoRAFound
+
+        return ra
+    }
+
+    fun getCEGroups(): List<String> {
+        val ceGroupRegex = Regex("([a-z],)+[a-z]")
+        val ceGroupList = mutableListOf<String>()
+
+        lines.forEach() { line ->
+            val match = ceGroupRegex.find(line)
+            match?.let { matchResult -> ceGroupList.add(matchResult.value) }
+        }
+
+        if (ceGroupList.isEmpty()) throw CENotFound
+        return ceGroupList
+    }
+
+    fun getCEs(): List<String> {
+        val ceRegex = Regex("UD\\d*\\.([a-z])")
+        val ceList = mutableListOf<String>()
+
+        lines.forEach() {line ->
+            val match = ceRegex.find(line)
+            match?.groupValues?.get(1)?.let { it1 -> ceList.add(it1) }
+        }
+
+        if (ceList.isEmpty()) throw CENotFound
+        return ceList
     }
 
     fun getGradeSection(): MutableList<MutableList<String>> {
@@ -132,9 +136,7 @@ class ModCSVFile(csvFile: File){
         }
         return columnStartIndex
     }
-
 }
-
 
     val decimalRegex = Regex(",\"(\\d,?\\d+)\",")
 
@@ -154,8 +156,6 @@ class ModCSVFile(csvFile: File){
     fun getUnidad() {
         //TODO Not yet implemented
     }
-
-
 
 //TODO Refactor getCSVFile to use logger instead of println
 //TODO refactor getCSVFile, consider using exception railroad
