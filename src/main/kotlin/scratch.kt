@@ -1,6 +1,6 @@
-import csvFile.modCsvFile
-import dto.ModDTO
+import csvFile.csvReader
+import dto.ModuloDTO
 
 fun main() {
-    val modDTO = ModDTO.assemble("Prog", modCsvFile)
+    val moduloDTO = ModuloDTO.assemble("Prog", csvReader)
 }

@@ -2,22 +2,22 @@ package csvFile
 
 import bingo.inputoutput.exceptions.log.Logging
 import bingo.inputoutput.exceptions.FileEmpty
+import dataSource.getCSVFile
+import entities.component.Instrument
 import exceptions.*
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
 import java.lang.StringBuilder
 
 
 //TODO temporary... Later on filePath will be passed as Main Argument
 val file = getCSVFile("src/files/UD1.csv")
-val modCsvFile = ModCSVFile(file)
+val csvReader = CSVReader(file)
 
 
-class ModCSVFile(csvFile: File){
+class CSVReader(csvFile: File) {
     private var lines: List<String>
     private val logger = Logging("CSVDAO")
-    private val linesList: MutableList<MutableList<String>>
+    val linesList: MutableList<MutableList<String>>
 
     init {
         lines = csvFile.readLines()
@@ -34,18 +34,17 @@ class ModCSVFile(csvFile: File){
         lines.forEach() { line ->
             line.forEach { char ->
 
-                if (char == ',' && !quotesOpen)
-                {
+                if (char == ',' && !quotesOpen) {
                     lineListed.add(string.toString())
                     string.clear()
-                }
-                else if (char == '"')
-                {
+                } else if (char == '"') {
                     quotesOpen = !quotesOpen
-                }
-                else
+                } else
                     string.append(char)
             }
+            lineListed.add(string.toString()) //Collects last string not followed by comma
+            string.clear()
+
             allLines.add(lineListed.toMutableList())
             lineListed.clear()
         }
@@ -68,7 +67,7 @@ class ModCSVFile(csvFile: File){
     }
 
     fun getRA(): Int? {
-        val raRegex = Regex("RA(\\d{1})")
+        val raRegex = Regex("RA(\\d)")
         var ra: Int? = null
 
         lines.forEach { line ->
@@ -84,24 +83,32 @@ class ModCSVFile(csvFile: File){
         return ra
     }
 
-    fun getCEGroups(): List<String> {
-        val ceGroupRegex = Regex("([a-z],)+[a-z]")
-        val ceGroupList = mutableListOf<String>()
+    fun getInstruments(): Pair<String, Int>? {
+        val ceGroupRegex = Regex("(([a-z],)+[a-z]).+,(\\d+)%,")
+        var instrumentPair: Pair<String, Int>? = null
+        var group: String?
+        var percent: Int?
 
         lines.forEach() { line ->
             val match = ceGroupRegex.find(line)
-            match?.let { matchResult -> ceGroupList.add(matchResult.value) }
-        }
+            group = match?.groupValues?.get(1)
+            percent = match?.groupValues?.get(3)?.toInt()
 
-        if (ceGroupList.isEmpty()) throw CENotFound
-        return ceGroupList
+            // Doing a null check before non-null assertion
+            if (group != null && percent != null) {
+                instrumentPair = Pair(group!!, percent!!)
+            } else {
+                 throw InstrumentsNotFound
+            }
+        }
+        return instrumentPair
     }
 
     fun getCEs(): List<String> {
         val ceRegex = Regex("UD\\d*\\.([a-z])")
         val ceList = mutableListOf<String>()
 
-        lines.forEach() {line ->
+        lines.forEach() { line ->
             val match = ceRegex.find(line)
             match?.groupValues?.get(1)?.let { it1 -> ceList.add(it1) }
         }
@@ -110,14 +117,15 @@ class ModCSVFile(csvFile: File){
         return ceList
     }
 
+    //TODO Check function of get grade section
     fun getGradeSection(): MutableList<MutableList<String>> {
         val lineListCopy = linesList.toMutableList()
         val firstStudentIndex: Int? = getStudentIndex(getStudents()[0])
 
-            lineListCopy.forEach {line ->
-                firstStudentIndex?.let { lineListCopy.drop(it)}
-                lineListCopy.add(line)
-            }
+        lineListCopy.forEach { line ->
+            firstStudentIndex?.let { lineListCopy.drop(it) }
+            lineListCopy.add(line)
+        }
 
         if (lineListCopy.isEmpty()) throw GradeSectionError
         return lineListCopy
@@ -126,52 +134,39 @@ class ModCSVFile(csvFile: File){
     private fun getStudentIndex(student: String): Int? {
         val columnStartIndex: Int?
 
-        linesList[1].indexOf(student).let {index ->
+        linesList[1].indexOf(student).let { index ->
             if (index > -1) {
                 columnStartIndex = index
-            }
-            else {
+            } else {
                 throw StudentIndexNotFound
             }
         }
         return columnStartIndex
     }
-}
 
-    val decimalRegex = Regex(",\"(\\d,?\\d+)\",")
+    fun findIndex(string: String): Int? {
+        var index: Int? = null
 
-    fun getFinalGradesUD() {
-        //TODO Not yet implemented
+        linesList.forEach() {list ->
+            list.indexOf(string).let {
+                if (it > -1) {
+                    index = it
+                }
+            }
+        }
+        return index
     }
 
-    fun getInstrumentos() {
-        //TODO Not yet implemented
-    }
+    fun findInstrumentRow(instrument: String): Int {
+        var instrumentRow: Int = -1
 
-    fun getFinalsGradesCE() {
-        //TODO Not yet implemented
-    }
+         linesList.forEach { line ->
+                if (line.contains(instrument)) {
+                    instrumentRow = line.indexOf(instrument)
+                }
+            }
+        if (instrumentRow < 0) throw InstrumentRowNotFound
 
-
-    fun getUnidad() {
-        //TODO Not yet implemented
+        return instrumentRow
     }
-
-//TODO Refactor getCSVFile to use logger instead of println
-//TODO refactor getCSVFile, consider using exception railroad
-fun getCSVFile(pathName: String): File  {
-    val csvFile: File?
-
-    try {
-        csvFile = File(pathName)
-    }
-    catch (e: FileNotFoundException) {
-        println("File not found in getCSVFile")
-        throw e
-    }
-    catch (e: IOException) {
-        println("Exception thrown in getCSVFile")
-        throw e
-    }
-        return csvFile
 }
