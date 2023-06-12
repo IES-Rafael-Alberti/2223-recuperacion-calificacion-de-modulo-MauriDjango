@@ -1,8 +1,6 @@
-import dto.moduloDTO
-import javax.sound.midi.Instrument
+import csvFile.csvReader
 
 fun main(args: Array<String>) {
-    moduloDTO.instruments.forEach {
-        Instrument
-    }
+    csvReader.getInstrumentComponents()
+}
 

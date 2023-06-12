@@ -1,6 +1,6 @@
 package exceptions
 
-object StudentListError : Throwable() {
+object StudentList : Throwable() {
     val msg = "Theres was an error extracting the students from the file"
 }
 

@@ -1,6 +1,7 @@
 package dao
 
-import entities.Student
+import entities.dataClasses.Student
+
 
 class StudentDAO: DAO<Student> {
     override fun create(): Student {

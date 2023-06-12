@@ -3,9 +3,14 @@ package csvFile
 import bingo.inputoutput.exceptions.log.Logging
 import bingo.inputoutput.exceptions.FileEmpty
 import dataSource.getCSVFile
-import entities.component.Instrument
+import entities.component.CEComponent
+import entities.component.InstrumentComponent
+import entities.component.RAComponent
+import entities.grade.InstrumentGrade
+import entities.grade.StudentGrade
 import exceptions.*
 import java.io.File
+import java.lang.Exception
 import java.lang.StringBuilder
 
 
@@ -14,15 +19,45 @@ val file = getCSVFile("src/files/UD1.csv")
 val csvReader = CSVReader(file)
 
 
+//TODO extract line iteration in methods to single function
+//TODO consider putting method returns into properties
 class CSVReader(csvFile: File) {
     private var lines: List<String>
     private val logger = Logging("CSVDAO")
     val linesList: MutableList<MutableList<String>>
 
+
     init {
         lines = csvFile.readLines()
         if (lines.isEmpty()) throw FileEmpty
         linesList = linesToList()
+    }
+
+    private val raPercentIndex = findIndex("%RA")
+    private val cePercentIndex = findIndex("%CE")
+    private val gradeSectionIndex = linesList.indexOfFirst { it.isNotEmpty() }
+
+/*    val raComponents: Pair<String, Double>? = getRaComponents()
+    val ceComponents: MutableList<Pair<String, Double>> = getCeComponents()
+    val instrumentComponents: MutableList<Pair<String, Double>> = getInstrumentComponents()
+
+    val studentGrades: MutableList<String> = getStudentNames()
+    val raGrade: MutableList<MutableList<String>> = getRAGrade()
+    val ceGrades: MutableList<MutableList<String>> = getCeGrades()
+    val instrumentGrades: MutableList<MutableList<String>> = getInstrumentGrades()*/
+
+
+    private fun findIndex(string: String): Int? {
+        var index: Int? = null
+
+        linesList.forEach() {list ->
+            list.indexOf(string).let {
+                if (it > -1) {
+                    index = it
+                }
+            }
+        }
+        return index
     }
 
     private fun linesToList(): MutableList<MutableList<String>> {
@@ -52,7 +87,19 @@ class CSVReader(csvFile: File) {
         return allLines
     }
 
-    fun getStudents(): MutableList<String> {
+    private fun getStudentGrades(): MutableList<StudentGrade> {
+        val studentGrades: MutableList<StudentGrade> = mutableListOf()
+
+        getStudentNames().forEach {studentName ->
+            studentGrades.add(
+                StudentGrade(studentName)
+            )
+        }
+        if (studentGrades.isEmpty()) throw StudentGradesEmpty
+        return studentGrades
+    }
+
+    private fun getStudentNames(): MutableList<String> {
         val studentList = mutableListOf<String>()
         val firstStudentIndex: Int?
 
@@ -66,107 +113,114 @@ class CSVReader(csvFile: File) {
         return studentList
     }
 
-    fun getRA(): Int? {
+    private fun getRAGrade(): MutableList<MutableList<String>> {
+        val raRowRegex = Regex("UD(\\d+)")
+        val rsGrades: MutableList<MutableList<String>> = mutableListOf()
+
+        linesList.forEach {line ->
+            line.forEach {element ->
+                raRowRegex.find(element)?.let {
+                    rsGrades.add(line.subList(gradeSectionIndex, line.size))
+                    }
+                }
+            }
+        if (rsGrades.isEmpty()) throw RAGradeEmpty
+        return rsGrades
+    }
+
+    private fun getCeGrades(): MutableList<MutableList<String>> {
+        val ceRegex = Regex("UD\\d*\\.([a-z])")
+        val ceGradesList: MutableList<
+                MutableList<String>> = mutableListOf()
+
+        linesList.forEach { line ->
+            line.forEach {element ->
+                ceRegex.find(element)?.let { match ->
+                    ceGradesList.add(line.subList(gradeSectionIndex, line.size))
+                }
+            }
+        }
+        if (ceGradesList.isEmpty()) throw CEGradesListEmpty
+        return ceGradesList
+    }
+
+    private fun getInstrumentGrades(): MutableList<MutableList<String>> {
+        val ceGroupRegex = Regex("(([a-z],)+[a-z]).+,(\\d+)%,")
+        val instrumentGrades: MutableList<MutableList<String>> = mutableListOf()
+
+        linesList.forEach {line ->
+            line.forEach {element ->
+                ceGroupRegex.find(element)?.let {
+                    instrumentGrades.add(line.subList(gradeSectionIndex, line.size))
+                }
+            }
+        }
+        if (instrumentGrades.isEmpty()) throw InstrumentGradeEmpty
+        return instrumentGrades
+    }
+
+    private fun getRaComponents(): Pair<String, Double>? {
         val raRegex = Regex("RA(\\d)")
-        var ra: Int? = null
+        var ra: Pair<String, Double>? = null
 
-        lines.forEach { line ->
-            val match = raRegex.find(line)
-
-            match?.groupValues?.get(1)?.let {
-                if (ra != null && ra != it.toInt()) throw RADetectedTwice
-                ra = it.toInt()
+        linesList.forEach { line ->
+            line.forEach { element ->
+                raRegex.find(element)?.let { matchResult ->
+                    if (raPercentIndex != null) {
+                        ra = Pair(matchResult.groupValues[1], line[raPercentIndex].toDouble())
+                    }
+                }
             }
         }
         if (ra == null) throw NoRAFound
-
         return ra
     }
 
-    fun getInstruments(): Pair<String, Int>? {
-        val ceGroupRegex = Regex("(([a-z],)+[a-z]).+,(\\d+)%,")
-        var instrumentPair: Pair<String, Int>? = null
-        var group: String?
-        var percent: Int?
 
-        lines.forEach() { line ->
-            val match = ceGroupRegex.find(line)
-            group = match?.groupValues?.get(1)
-            percent = match?.groupValues?.get(3)?.toInt()
-
-            // Doing a null check before non-null assertion
-            if (group != null && percent != null) {
-                instrumentPair = Pair(group!!, percent!!)
-            } else {
-                 throw InstrumentsNotFound
-            }
-        }
-        return instrumentPair
-    }
-
-    fun getCEs(): List<String> {
+    private fun getCeComponents(): MutableList<Pair<String, Double>> {
         val ceRegex = Regex("UD\\d*\\.([a-z])")
-        val ceList = mutableListOf<String>()
+        val ceList: MutableList<Pair<String, Double>> = mutableListOf()
 
-        lines.forEach() { line ->
-            val match = ceRegex.find(line)
-            match?.groupValues?.get(1)?.let { it1 -> ceList.add(it1) }
-        }
-
-        if (ceList.isEmpty()) throw CENotFound
+        try {
+            linesList.forEach() { line ->
+                line.forEach() { element ->
+                    ceRegex.find(element)?.let {
+                        if (cePercentIndex != null) {
+                            ceList.add(
+                                Pair(
+                                    it.groupValues[1],
+                                    line[cePercentIndex].toDouble()
+                                )
+                            )
+                        } else throw CEPercentIndex
+                    }
+                }
+            }
+            if (ceList.isEmpty()) throw NOCEFound
+            } catch (e: Exception) {
+            throw GetCEError
+            }
         return ceList
     }
 
-    //TODO Check function of get grade section
-    fun getGradeSection(): MutableList<MutableList<String>> {
-        val lineListCopy = linesList.toMutableList()
-        val firstStudentIndex: Int? = getStudentIndex(getStudents()[0])
+    fun getInstrumentComponents(): MutableList<Pair<String, Double>> {
+        val ceGroupRegex = Regex("(([a-z],)+[a-z]).+,(\\d+)%,")
+        val instruments = mutableListOf<Pair<String, Double>>()
 
-        lineListCopy.forEach { line ->
-            firstStudentIndex?.let { lineListCopy.drop(it) }
-            lineListCopy.add(line)
-        }
-
-        if (lineListCopy.isEmpty()) throw GradeSectionError
-        return lineListCopy
-    }
-
-    private fun getStudentIndex(student: String): Int? {
-        val columnStartIndex: Int?
-
-        linesList[1].indexOf(student).let { index ->
-            if (index > -1) {
-                columnStartIndex = index
-            } else {
-                throw StudentIndexNotFound
-            }
-        }
-        return columnStartIndex
-    }
-
-    fun findIndex(string: String): Int? {
-        var index: Int? = null
-
-        linesList.forEach() {list ->
-            list.indexOf(string).let {
-                if (it > -1) {
-                    index = it
+        linesList.forEach() {line ->
+            line.forEach() {element ->
+                ceGroupRegex.find(element)?.let { match ->
+                    if (raPercentIndex != null) {
+                        instruments.add(
+                            Pair(
+                                match.groupValues[1],
+                                line[raPercentIndex].toDouble()
+                            )
+                        )
+                    } else throw RAPercentIndex
                 }
             }
         }
-        return index
-    }
-
-    fun findInstrumentRow(instrument: String): Int {
-        var instrumentRow: Int = -1
-
-         linesList.forEach { line ->
-                if (line.contains(instrument)) {
-                    instrumentRow = line.indexOf(instrument)
-                }
-            }
-        if (instrumentRow < 0) throw InstrumentRowNotFound
-
-        return instrumentRow
+        return instruments
     }
 }

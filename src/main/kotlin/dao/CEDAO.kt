@@ -1,6 +1,6 @@
 package dao
 
-import entities.CE
+import entities.dataClasses.CE
 
 
 class CEDAO(): DAO<CE> {
