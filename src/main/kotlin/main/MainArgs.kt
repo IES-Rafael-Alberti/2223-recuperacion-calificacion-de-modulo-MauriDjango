@@ -4,7 +4,6 @@ import dao.*
 import entities.grade.Modulo
 import entities.grade.Student
 import exceptions.GetDBOptionError
-import exceptions.StudentEmpty
 import org.slf4j.LoggerFactory
 
 const val moduloArgument = "-mo"
@@ -62,7 +61,7 @@ class MainArgs(private val args: Array<String>) {
                 deleteAll()
                 return null
             }
-            3 -> retreiveDataClasses()
+            3 -> retrieveDataClasses()
             else -> {throw GetDBOptionError
             }
         }
@@ -95,26 +94,31 @@ class MainArgs(private val args: Array<String>) {
         }
     }
 
-    private fun retreiveDataClasses(): MutableList<Student> {
+    private fun retrieveDataClasses(): MutableList<Student> {
         val studentLists: MutableList<Student> = mutableListOf()
+        val students = studentDAO.getAll()
+        val modulos = moduloDAO.getAll()
+        val ras = raDAO.getAll()
+        val ces = ceDAO.getAll()
+        val instruments = instrumentDAO.getAll()
 
-        studentDAO.getAll().forEach { student ->
+        students.forEach { student ->
             studentLists.add(student)
-            moduloDAO.getAll().forEach { modulo ->
+            modulos.forEach { modulo ->
                 if (student.id == modulo.superComponentID) {
-                    student.apply { this.modulos.add(modulo as Modulo) }
-                }
-                raDAO.getAll().forEach { raGrade ->
-                    if (raGrade.superComponentID == modulo.id) {
-                        modulo.apply { this.subComponents.add(raGrade) }
-                    }
-                    ceDAO.getAll().forEach { ceGrade ->
-                        if (raGrade.id == ceGrade.superComponentID) {
-                            ceGrade.subComponents.add(raGrade)
-                        }
-                        instrumentDAO.getAll().forEach { instrumentGrade ->
-                            if (ceGrade.id == instrumentGrade.superComponentID) {
-                                ceGrade.subComponents.add(instrumentGrade)
+                    student.modulos.add(modulo as Modulo)
+                    ras.forEach { raGrade ->
+                        if (raGrade.superComponentID == modulo.id) {
+                            modulo.subComponents.add(raGrade)
+                            ces.forEach { ceGrade ->
+                                if (raGrade.id == ceGrade.superComponentID) {
+                                    raGrade.subComponents.add(ceGrade)
+                                    instruments.forEach { instrumentGrade ->
+                                        if (ceGrade.id == instrumentGrade.superComponentID) {
+                                            ceGrade.subComponents.add(instrumentGrade)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

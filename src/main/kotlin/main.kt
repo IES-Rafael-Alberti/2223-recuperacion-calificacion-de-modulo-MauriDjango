@@ -1,5 +1,3 @@
-package main
-
 import Assembler.StudentAssembler
 import csv.CSVReader
 import csv.getCSVFiles
@@ -7,15 +5,14 @@ import display.Display
 import entities.grade.Student
 import exceptions.NoCSVFile
 import exceptions.NoPathFound
+import main.MainArgs
 import org.slf4j.LoggerFactory
 import java.io.File
 
 
-val mainArg = "-mo PRO -pi src/files -bd q".split(" ").toTypedArray()
-
-fun main(args: Array<String> = mainArg) {
+fun main(args: Array<String>) {
     val logger = LoggerFactory.getLogger("Main")
-    val mainArgs = MainArgs(mainArg)
+    val mainArgs = MainArgs(args)
     val path = mainArgs.getPath()
     val csvFiles: MutableList<File> = mutableListOf()
     val csvReaders: MutableList<CSVReader> = mutableListOf()

@@ -16,7 +16,7 @@ object DataSourceFactory {
                 config.username = "user"
                 config.password = "user"
                 config.driverClassName = "org.h2.Driver"
-                config.maximumPoolSize = 30
+                config.maximumPoolSize = 10
                 config.isAutoCommit = true
                 config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
                 HikariDataSource(config)

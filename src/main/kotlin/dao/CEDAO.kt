@@ -1,10 +1,8 @@
 package dao
 
 import entities.component.CEComponent
-import entities.component.ModuloComponent
 import entities.grade.CEGrade
 import entities.grade.Grade
-import entities.grade.RAGrade
 import exceptions.StudentEmpty
 import hikarih2ds
 import org.slf4j.LoggerFactory

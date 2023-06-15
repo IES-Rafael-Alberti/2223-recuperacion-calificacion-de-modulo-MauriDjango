@@ -74,6 +74,7 @@ class RADAO(private val dataSource: DataSource): DAO<Grade> {
     override fun getAll(): MutableList<Grade> {
         val sql = "SELECT * FROM RESULTADOAPRENDIZAJE"
         val ra: MutableList<Grade> = mutableListOf()
+
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 val resultSet = stmt.executeQuery()

@@ -3,6 +3,10 @@ package Assembler
 import csv.CSVReader
 import exceptions.StringToDoubleDefault
 
+/**
+ * This class helps with the assembly of multiple classes that are comprised of each other
+ *
+ */
 abstract class Assembler<T>(csvReader: CSVReader) {
     fun stringToDouble(string: String): Double {
         val percentRegex = Regex("(\\d+,?\\d*)")

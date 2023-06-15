@@ -39,6 +39,7 @@ object Display {
                     "Percentage " + raGrade.component.percentage.toString(),
                     "Grade " + raGrade.getGrade().toString()
                 )
+
                 raGrade.subComponents.forEach { ce ->
                     row(
                         "CE." + ce.component.componentName,
@@ -52,7 +53,7 @@ object Display {
                     alignment(1, Table.Hints.Alignment.RIGHT)
                     borderStyle = Table.BorderStyle.SINGLE_LINE
                 }
-            }.render().trim()
+            }.render()
         }
     }
 
