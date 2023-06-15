@@ -1,28 +1,33 @@
 package dao
 
+import entities.component.ModuloComponent
+import entities.component.RAComponent
 import entities.grade.Grade
-import entities.grade.Student
+import entities.grade.Modulo
+import entities.grade.RAGrade
 import exceptions.StudentEmpty
 import hikarih2ds
-import org.h2.message.DbException
 import org.slf4j.LoggerFactory
-import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*
 import javax.sql.DataSource
 
-var studentDAO = StudentDAO(hikarih2ds)
 
-class StudentDAO(private val dataSource: DataSource): DAO<Student> {
-    private val logger = LoggerFactory.getLogger("StudentDAO")
+val raDAO = RADAO(hikarih2ds)
 
-    override fun create(t: Student): Student {
+class RADAO(private val dataSource: DataSource): DAO<Grade> {
+    private val logger = LoggerFactory.getLogger("RADAO")
+
+    override fun create(t: Grade): Grade {
         try {
-            val sql = "INSERT INTO STUDENT (id, studentname) VALUES (?, ?)"
+            val sql = "INSERT INTO RESULTADOAPRENDIZAJE (id, raName, moduloID, grade, percentage) VALUES (?, ?, ?, ?, ?)"
             dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     stmt.setString(1, t.id.toString())
-                    stmt.setString(2, t.name)
+                    stmt.setString(2, t.component.componentName)
+                    stmt.setString(3, t.superComponentID.toString())
+                    stmt.setDouble(4, t.getGrade())
+                    stmt.setDouble(5, t.component.percentage)
                     stmt.execute()
                 }
             }
@@ -35,7 +40,7 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
     override fun createTable() {
         try {
             val sql =
-                "CREATE TABLE STUDENT (id VARCHAR(50) PRIMARY KEY , studentName VARCHAR(100));"
+                "CREATE TABLE RESULTADOAPRENDIZAJE (id VARCHAR(50) PRIMARY KEY, raName VARCHAR(50), moduloID VARCHAR(50), grade DOUBLE, percentage DOUBLE);"
             dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     val result = stmt.executeUpdate()
@@ -45,8 +50,9 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
             logger.warn(e.message)
         }
     }
-    override fun deleteById(t: Student): Student {
-        val sql = "DELETE FROM STUDENT WHERE id = ?"
+
+    override fun deleteById(t: Grade): Grade {
+        val sql = "DELETE FROM RESULTADOAPRENDIZAJE WHERE id = ?"
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.setString(1, t.id.toString())
@@ -57,7 +63,7 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
     }
 
     override fun deleteAll() {
-        val sql = "DELETE FROM STUDENT"
+        val sql = "DELETE FROM RESULTADOAPRENDIZAJE"
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 stmt.executeUpdate()
@@ -65,34 +71,36 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
         }
     }
 
-    override fun getAll(): MutableList<Student> {
-        val sql = "SELECT * FROM STUDENT;"
-        val students: MutableList<Student> = mutableListOf()
-
+    override fun getAll(): MutableList<Grade> {
+        val sql = "SELECT * FROM RESULTADOAPRENDIZAJE"
+        val ra: MutableList<Grade> = mutableListOf()
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
                 val resultSet = stmt.executeQuery()
                 while (resultSet.next()) {
-                    students.add(
-                        Student(
-                            name = resultSet.getString("studentName"),
+                    ra.add(
+                        RAGrade(
+                            component = RAComponent(
+                                resultSet.getString("raName"),
+                                resultSet.getDouble("percentage")
+                            ),
+                            superComponentID = UUID.fromString(resultSet.getString("moduloID")),
                             id = UUID.fromString(resultSet.getString("id"))
                         )
                     )
                 }
             }
         }
-        if (students.isEmpty()) throw StudentEmpty
-        return students
+        if (ra.isEmpty()) throw StudentEmpty
+        return ra
     }
 
-    override fun updateById(t: Student): Student {
+    override fun updateById(t: Grade): Grade {
         TODO("Not yet implemented")
     }
 
-    override fun getById(t: Student): Student {
+    override fun getById(t: Grade): Grade {
         TODO("Not yet implemented")
     }
 
 }
-
