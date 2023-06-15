@@ -1,8 +1,14 @@
 package dao
 
+import entities.grade.Student
+import java.sql.ResultSet
+
 interface DAO<T> {
-    abstract fun  create():T
-    abstract fun getById():T
-    abstract fun updateById():T
-    abstract fun deleteById():T
+    fun  create(t: T):T
+    fun createTable()
+    fun getById(t: T):T
+    fun updateById(t: T):T
+    fun deleteById(t: T):T
+    fun deleteAll()
+    fun getAll(): MutableList<T>
 }

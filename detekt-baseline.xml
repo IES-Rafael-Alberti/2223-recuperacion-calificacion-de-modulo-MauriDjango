@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>EmptyClassBlock:CEGrade.kt$CEGrade${ }</ID>
+    <ID>EmptyClassBlock:CEGradesEmpty.kt$CEGradesEmpty${ }</ID>
+    <ID>EmptyClassBlock:CEGradesListEmpty.kt$CEGradesListEmpty${ }</ID>
+    <ID>EmptyClassBlock:CEInstrumentNotFound.kt$CEInstrumentNotFound${ }</ID>
+    <ID>EmptyClassBlock:CEPercentIndex.kt$CEPercentIndex${ }</ID>
+    <ID>EmptyClassBlock:GetCEError.kt$GetCEError${ }</ID>
+    <ID>EmptyClassBlock:GetInstrumentGradesEmpty.kt$GetInstrumentGradesEmpty${ }</ID>
+    <ID>EmptyClassBlock:GradeSection.kt$GradeSection${ }</ID>
+    <ID>EmptyClassBlock:IndexNotFound.kt$IndexNotFound${ }</ID>
+    <ID>EmptyClassBlock:InstrumentComponentsEmpty.kt$InstrumentComponentsEmpty${ }</ID>
+    <ID>EmptyClassBlock:InstrumentGradeEmpty.kt$InstrumentGradeEmpty${ }</ID>
+    <ID>EmptyClassBlock:InstrumentRowNotFound.kt$InstrumentRowNotFound${ }</ID>
+    <ID>EmptyClassBlock:LinesToListError.kt$LinesToListError${ }</ID>
+    <ID>EmptyClassBlock:ListEmpty.kt$ListEmpty${ }</ID>
+    <ID>EmptyClassBlock:Modulo.kt$Modulo${ }</ID>
+    <ID>EmptyClassBlock:ModuloComponent.kt$ModuloComponent${ }</ID>
+    <ID>EmptyClassBlock:ModuloGrade.kt$ModuloGrade${ }</ID>
+    <ID>EmptyClassBlock:MultipleRAComponentsFound.kt$MultipleRAComponentsFound${ }</ID>
+    <ID>EmptyClassBlock:NOCEFound.kt$NOCEFound${ }</ID>
+    <ID>EmptyClassBlock:NoCSVFile.kt$NoCSVFile${ }</ID>
+    <ID>EmptyClassBlock:NoPathFound.kt$NoPathFound${ }</ID>
+    <ID>EmptyClassBlock:NoRAFound.kt$NoRAFound${ }</ID>
+    <ID>EmptyClassBlock:NoStudent.kt$NoStudent${ }</ID>
+    <ID>EmptyClassBlock:RAAssembly.kt$RAAssembly${ }</ID>
+    <ID>EmptyClassBlock:RADetectedTwice.kt$RADetectedTwice${ }</ID>
+    <ID>EmptyClassBlock:RAGrade.kt$RAGrade${ }</ID>
+    <ID>EmptyClassBlock:RAGradeEmpty.kt$RAGradeEmpty${ }</ID>
+    <ID>EmptyClassBlock:RAPercentIndex.kt$RAPercentIndex${ }</ID>
+    <ID>EmptyClassBlock:StringToDoubleDefault.kt$StringToDoubleDefault${ }</ID>
+    <ID>EmptyClassBlock:StudentEmpty.kt$StudentEmpty${ }</ID>
+    <ID>EmptyClassBlock:StudentGradesEmpty.kt$StudentGradesEmpty${ }</ID>
+    <ID>EmptyClassBlock:StudentIndexNotFound.kt$StudentIndexNotFound${ }</ID>
+    <ID>InvalidPackageDeclaration:FileEmpty.kt$package bingo.inputoutput.exceptions</ID>
+    <ID>InvalidPackageDeclaration:Logging.kt$package bingo.inputoutput.exceptions.log</ID>
+    <ID>MagicNumber:CEDAO.kt$CEDAO$3</ID>
+    <ID>MagicNumber:CEDAO.kt$CEDAO$4</ID>
+    <ID>MagicNumber:Grade.kt$Grade$100</ID>
+    <ID>MagicNumber:HikariDataSource.kt$DataSourceFactory$10</ID>
+    <ID>MagicNumber:InstrumentDAO.kt$InstrumentDAO$3</ID>
+    <ID>MagicNumber:InstrumentDAO.kt$InstrumentDAO$4</ID>
+    <ID>MagicNumber:ModuloDAO.kt$ModuloDAO$3</ID>
+    <ID>MagicNumber:ModuloDAO.kt$ModuloDAO$4</ID>
+    <ID>MagicNumber:RADAO.kt$RADAO$3</ID>
+    <ID>MagicNumber:RADAO.kt$RADAO$4</ID>
+    <ID>MatchingDeclarationName:HikariDataSource.kt$DataSourceFactory</ID>
+    <ID>MaxLineLength:CEDAO.kt$CEDAO$"CREATE TABLE CRITERIOEVALUACION (id VARCHAR(50) PRIMARY KEY, instrumento VARCHAR(50), studentName VARCHAR(100), grade decimal(50));"</ID>
+    <ID>MaxLineLength:InstrumentDAO.kt$InstrumentDAO$"CREATE TABLE INSTRUMENT (id VARCHAR(50) PRIMARY KEY, instrument VARCHAR(50), studentName VARCHAR(100), grade decimal(50));"</ID>
+    <ID>MaxLineLength:InstrumentGrade.kt$InstrumentGrade$class</ID>
+    <ID>MaxLineLength:ModuloDAO.kt$ModuloDAO$"CREATE TABLE MODULO (id VARCHAR(50) PRIMARY KEY, modulo VARCHAR(50), studentName VARCHAR(100), grade decimal(50));"</ID>
+    <ID>MaxLineLength:RADAO.kt$RADAO$"CREATE TABLE RESULTADOAPRENDIZAJE (id VARCHAR(50) PRIMARY KEY, criterio VARCHAR(50), studentName VARCHAR(100), grade decimal(50));"</ID>
+    <ID>MayBeConst:FileEmpty.kt$FileEmpty$val msg = "CSV file was accedsed but was empty."</ID>
+    <ID>MayBeConst:StudentList.kt$StudentList$val msg = "Theres was an error extracting the students from the file"</ID>
+    <ID>NestedBlockDepth:CSVReader.kt$CSVReader$fun getCeComponents(): MutableList&lt;Pair&lt;String, String&gt;&gt;</ID>
+    <ID>NestedBlockDepth:CSVReader.kt$CSVReader$fun getInstrumentComponents(): MutableList&lt;Pair&lt;String, String&gt;&gt;</ID>
+    <ID>NestedBlockDepth:CSVReader.kt$CSVReader$fun getInstrumentGrade(studentName: String, component: InstrumentComponent): String?</ID>
+    <ID>NestedBlockDepth:CSVReader.kt$CSVReader$fun getRAComponent(): Pair&lt;String, String&gt;?</ID>
+    <ID>NestedBlockDepth:CSVReader.kt$CSVReader$fun overwriteGrades(students: MutableList&lt;Student&gt;, raGrade: RAGrade): MutableList&lt;MutableList&lt;String&gt;&gt;</ID>
+    <ID>NestedBlockDepth:MainArgs.kt$MainArgs$fun generateDataClasses(students: MutableList&lt;Student&gt;)</ID>
+    <ID>NewLineAtEndOfFile:CEDAO.kt$dao.CEDAO.kt</ID>
+    <ID>NewLineAtEndOfFile:CSVFile.kt$csv.CSVFile.kt</ID>
+    <ID>NewLineAtEndOfFile:CSVReader.kt$csv.CSVReader.kt</ID>
+    <ID>NewLineAtEndOfFile:CSVWriter.kt$csv.CSVWriter.kt</ID>
+    <ID>NewLineAtEndOfFile:Component.kt$entities.component.Component.kt</ID>
+    <ID>NewLineAtEndOfFile:DAO.kt$dao.DAO.kt</ID>
+    <ID>NewLineAtEndOfFile:Display.kt$display.Display.kt</ID>
+    <ID>NewLineAtEndOfFile:Grade.kt$entities.grade.Grade.kt</ID>
+    <ID>NewLineAtEndOfFile:HikariDataSource.kt$.HikariDataSource.kt</ID>
+    <ID>NewLineAtEndOfFile:InstrumentDAO.kt$dao.InstrumentDAO.kt</ID>
+    <ID>NewLineAtEndOfFile:ModuloComponent.kt$entities.component.ModuloComponent.kt</ID>
+    <ID>NewLineAtEndOfFile:ModuloDAO.kt$dao.ModuloDAO.kt</ID>
+    <ID>NewLineAtEndOfFile:ModuloGrade.kt$entities.grade.ModuloGrade.kt</ID>
+    <ID>NewLineAtEndOfFile:RAComponent.kt$entities.component.RAComponent.kt</ID>
+    <ID>NewLineAtEndOfFile:RADAO.kt$dao.RADAO.kt</ID>
+    <ID>NewLineAtEndOfFile:RAGrade.kt$entities.grade.RAGrade.kt</ID>
+    <ID>NewLineAtEndOfFile:Student.kt$entities.grade.Student.kt</ID>
+    <ID>PackageNaming:Assembler.kt$package Assembler</ID>
+    <ID>PackageNaming:StudentAssembler.kt$package Assembler</ID>
+    <ID>ReturnCount:InstrumentDAO.kt$InstrumentDAO$override fun create(t: Grade): Grade</ID>
+    <ID>SwallowedException:CSVReader.kt$CSVReader$e: Exception</ID>
+    <ID>ThrowsCount:CSVReader.kt$CSVReader$fun getCeComponents(): MutableList&lt;Pair&lt;String, String&gt;&gt;</ID>
+    <ID>TooGenericExceptionCaught:CSVReader.kt$CSVReader$e: Exception</ID>
+    <ID>TopLevelPropertyNaming:MainArgs.kt$const val dbArgument = "-bd"</ID>
+    <ID>TopLevelPropertyNaming:MainArgs.kt$const val moduloArgument = "-mo"</ID>
+    <ID>TopLevelPropertyNaming:MainArgs.kt$const val pathArgument = "-pi"</ID>
+    <ID>UnnecessaryAbstractClass:Assembler.kt$Assembler$Assembler</ID>
+    <ID>UnnecessaryAbstractClass:Component.kt$Component$Component</ID>
+    <ID>UnnecessaryAbstractClass:Grade.kt$Grade$Grade</ID>
+    <ID>UnusedPrivateMember:Assembler.kt$Assembler$csvReader: CSVReader</ID>
+    <ID>UnusedPrivateMember:CEDAO.kt$CEDAO$val result = stmt.executeUpdate()</ID>
+    <ID>UnusedPrivateMember:CSVReader.kt$CSVReader$private val gradeSectionIndex = findIndex("%RA")?.plus(1)</ID>
+    <ID>UnusedPrivateMember:CSVReader.kt$CSVReader$private val logger = Logging("CSVDAO")</ID>
+    <ID>UnusedPrivateMember:CSVReader.kt$CSVReader$var ceIndex: Int? = null</ID>
+    <ID>UnusedPrivateMember:CSVWriter.kt$CSVWriter$private val cePercentIndex = findIndex("%CE")</ID>
+    <ID>UnusedPrivateMember:CSVWriter.kt$CSVWriter$private val gradeSectionIndex = findIndex("%RA")?.plus(1)</ID>
+    <ID>UnusedPrivateMember:CSVWriter.kt$CSVWriter$private val logger = Logging("CSVDAO")</ID>
+    <ID>UnusedPrivateMember:CSVWriter.kt$CSVWriter$private val raPercentIndex = findIndex("%RA")</ID>
+    <ID>UnusedPrivateMember:InstrumentDAO.kt$InstrumentDAO$val result = stmt.executeUpdate()</ID>
+    <ID>UnusedPrivateMember:Main.kt$val logger = LoggerFactory.getLogger("Main")</ID>
+    <ID>UnusedPrivateMember:ModuloDAO.kt$ModuloDAO$val result = stmt.executeUpdate()</ID>
+    <ID>UnusedPrivateMember:RADAO.kt$RADAO$val result = stmt.executeUpdate()</ID>
+    <ID>UnusedPrivateMember:StudentDAO.kt$StudentDAO$val result = stmt.executeUpdate()</ID>
+    <ID>WildcardImport:CSVReader.kt$import exceptions.*</ID>
+    <ID>WildcardImport:MainArgs.kt$import dao.*</ID>
+    <ID>WildcardImport:StudentAssembler.kt$import dao.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

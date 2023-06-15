@@ -1,20 +1,22 @@
-package dataSource
+package csv
 
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
 
-//TODO temporary... Later on filePath will be passed as Main Argument
-val csvFile = getCSVFile("../files/UD1.csv")
-
 //TODO Refactor getCSVFile to use logger instead of println
 //TODO refactor getCSVFile, consider using exception railroad
-fun getCSVFile(pathName: String): File {
-    val csvFile: File?
+fun getCSVFiles(pathName: String): MutableList<File> {
+    val directoryPath = File(pathName)
+    val csvFileList: MutableList<File> = mutableListOf()
 
     try {
-        csvFile = File(pathName)
+        directoryPath.walk().forEach { file ->
+            if (file.isFile && file.extension == "csv") {
+                csvFileList.add(file)
+            }
+        }
     }
     catch (e: FileNotFoundException) {
         println("File not found in getCSVFile")
@@ -24,5 +26,5 @@ fun getCSVFile(pathName: String): File {
         println("Exception thrown in getCSVFile")
         throw e
     }
-        return csvFile
+    return csvFileList
 }
