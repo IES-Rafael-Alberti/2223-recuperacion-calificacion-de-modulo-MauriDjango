@@ -2,12 +2,22 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import javax.sql.DataSource
 
+
+/**
+ * An object that generates a Datasource
+ */
 object DataSourceFactory {
     enum class DataSourceType {
         HIKARI,
         JDBC
     }
 
+    /**
+     * Generates a Datasource based on DataSourceType
+     *
+     * @param dataSourceType: DataSourceType
+     * @return Datasource
+     */
     fun getDS(dataSourceType: DataSourceType): DataSource {
         return when (dataSourceType) {
             DataSourceType.HIKARI -> {

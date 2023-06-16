@@ -13,6 +13,13 @@ import javax.sql.DataSource
 
 var studentDAO = StudentDAO(hikarih2ds)
 
+/**
+ * A class that implements DAO
+ * Accesses the Instrument aspects of the DB
+ *
+ * @param dataSource: A datasource that provides the connection to the database
+ * @property logger: Logger
+ */
 class StudentDAO(private val dataSource: DataSource): DAO<Student> {
     private val logger = LoggerFactory.getLogger("StudentDAO")
 
@@ -45,6 +52,7 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
             logger.warn(e.message)
         }
     }
+
     override fun deleteById(t: Student): Student {
         val sql = "DELETE FROM STUDENT WHERE id = ?"
         dataSource.connection.use { conn ->
@@ -82,7 +90,6 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
                 }
             }
         }
-        if (students.isEmpty()) throw StudentEmpty
         return students
     }
 

@@ -1,81 +1,35 @@
-package main
+package dao
 
-import dao.*
 import entities.grade.Modulo
 import entities.grade.Student
-import exceptions.GetDBOptionError
 import org.slf4j.LoggerFactory
 
-const val moduloArgument = "-mo"
-const val pathArgument = "-pi"
-const val dbArgument = "-bd"
 
-class MainArgs(private val args: Array<String>) {
-    val logger = LoggerFactory.getLogger("MainArgs")
+/**
+ * A utility class for managing DAO operations and interacting with the database.
+ */
+object DAOUtilities {
+    val logger = LoggerFactory.getLogger("DAOUtilities")
 
-    fun getModulo(): String {
-        var modulo: String = "Programacion"
-        if (moduloArgument in args) {
-            modulo = args[args.indexOf(moduloArgument) + 1]
-        }
-        return modulo
-    }
 
-    fun getPath(): String? {
-        var path: String? = null
-        if (pathArgument in args) {
-            path = args[args.indexOf(pathArgument) + 1]
-        }
-        return path
-    }
-
-    fun getDB(): Int {
-        var option = 0
-        try {
-            if (dbArgument in args) {
-                generateTables()
-                option = 1
-                if (args[args.indexOf(dbArgument) + 1] == "d") {
-                    option = 2
-                    getDBOption(option = option)
-                }
-                if (args[args.indexOf(dbArgument) + 1] == "q") {
-                    option = 3
-                    getDBOption(option = option)
-                }
-            }
-        } catch (e: IndexOutOfBoundsException) {
-            logger.warn(e.message)
-        }
-        return option
-    }
-
-    fun getDBOption(option: Int, students: MutableList<Student>? = null): MutableList<Student>? {
-
-        return when (option) {
-            1 -> {
-                students?.let {generateDataClasses(it)}
-                return null
-            }
-            2 -> {
-                deleteAll()
-                return null
-            }
-            3 -> retrieveDataClasses()
-            else -> {throw GetDBOptionError
-            }
-        }
-    }
-
-    private fun generateTables() {
+    /**
+     * Generates database tables for various entities.
+     */
+    fun generateTables() {
         studentDAO.createTable()
         moduloDAO.createTable()
         raDAO.createTable()
         ceDAO.createTable()
         instrumentDAO.createTable()
+        logger.debug("Tables generated")
     }
 
-    private fun generateDataClasses(students: MutableList<Student>) {
+    /**
+     * Creates database objects for the provided list of students and their associated entities.
+     *
+     * @param students The list of students to create in the database.
+     */
+    fun createDBObjects(students: MutableList<Student>) {
 
         students.forEach { student ->
             studentDAO.create(student)
@@ -92,9 +46,15 @@ class MainArgs(private val args: Array<String>) {
                 }
             }
         }
+        logger.debug("Objects inserted into Database")
     }
 
-    private fun retrieveDataClasses(): MutableList<Student> {
+    /**
+     * Retrieves database objects and their associated entities and constructs them into student objects.
+     *
+     * @return The list of retrieved students with their associated entities populated.
+     */
+    fun retrieveDBObjects(): MutableList<Student> {
         val studentLists: MutableList<Student> = mutableListOf()
         val students = studentDAO.getAll()
         val modulos = moduloDAO.getAll()
@@ -125,15 +85,19 @@ class MainArgs(private val args: Array<String>) {
                 }
             }
         }
+        logger.debug("DB objects retrieved")
         return studentLists
     }
 
-    private fun deleteAll() {
+    /**
+     * Deletes all database objects and associated entities.
+     */
+    fun deleteAll() {
         studentDAO.deleteAll()
         moduloDAO.deleteAll()
         raDAO.deleteAll()
         ceDAO.deleteAll()
         instrumentDAO.deleteAll()
+        logger.debug("All DB objects deleted")
     }
 }
-

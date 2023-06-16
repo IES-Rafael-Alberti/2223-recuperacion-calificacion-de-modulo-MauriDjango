@@ -12,6 +12,14 @@ import javax.sql.DataSource
 
 
 val moduloDAO = ModuloDAO(hikarih2ds)
+
+/**
+ * A class that implements DAO
+ * Accesses the Modulo aspects of the DB
+ *
+ * @param dataSource: A datasource that provides the connection to the database
+ * @property logger: Logger
+ */
 class ModuloDAO(private val dataSource: DataSource): DAO<Grade> {
     private val logger = LoggerFactory.getLogger("ModuloDAO")
 
@@ -86,7 +94,6 @@ class ModuloDAO(private val dataSource: DataSource): DAO<Grade> {
                 }
             }
         }
-        if (modulos.isEmpty()) throw StudentEmpty
         return modulos
     }
 

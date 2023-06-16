@@ -4,16 +4,28 @@ import de.m3y.kformat.Table
 import de.m3y.kformat.table
 import entities.grade.Grade
 import entities.grade.Modulo
-import entities.grade.RAGrade
 import entities.grade.Student
 
+
+/**
+ * An object that controls the interface output of the Application
+ * Uses KFormat Library
+ */
 object Display {
+
+    /**
+     * Transforms a student and a modulo into a table
+     *
+     * @param student: Student object
+     * @param modulo: Modulo object
+     * @return CharSequence: A CharSequence that when printed to console is a table
+     */
     fun toTable(student: Student, modulo: Modulo): CharSequence {
         student.let {
 
             return table {
                 header(
-                    student.initials,
+                    "Name",
                     student.name
                 )
                 row(
@@ -30,14 +42,20 @@ object Display {
         }
     }
 
+    /**
+     * Transforms an RAGrade into a table
+     *
+     * @param raGrade: RAGrade
+     * @return CharSequence: A CharSequence that when printed to console is a table
+     */
     fun toTable(raGrade: Grade): CharSequence {
         raGrade.let {
 
             return table {
                 header(
                     "RA" + raGrade.component.componentName,
-                    "Percentage " + raGrade.component.percentage.toString(),
-                    "Grade " + raGrade.getGrade().toString()
+                    "Percentage: " + raGrade.component.percentage.toString(),
+                    "Grade: " + raGrade.getGrade().toString()
                 )
 
                 raGrade.subComponents.forEach { ce ->
@@ -57,6 +75,11 @@ object Display {
         }
     }
 
+    /**
+     * Prints a table CharSequence to console
+     *
+     * @param table: Table CharSequence
+     */
     fun printTable(table: CharSequence) {
         println(table)
         println("\n")

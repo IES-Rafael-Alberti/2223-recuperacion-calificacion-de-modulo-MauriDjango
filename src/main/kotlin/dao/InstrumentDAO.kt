@@ -12,6 +12,14 @@ import javax.sql.DataSource
 
 
 val instrumentDAO = InstrumentDAO(hikarih2ds)
+
+/**
+ * A class that implements DAO
+ * Accesses the Instrument aspects of the DB
+ *
+ * @param dataSource: A datasource that provides the connection to the database
+ * @property logger: Logger
+ */
 class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
     private val logger = LoggerFactory.getLogger("InstrumentDAO")
 
@@ -97,7 +105,6 @@ class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
                 }
             }
         }
-        if (instruments.isEmpty()) throw StudentEmpty
         return instruments
     }
 }

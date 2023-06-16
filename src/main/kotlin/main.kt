@@ -1,77 +1,68 @@
 import Assembler.StudentAssembler
-import csv.CSVReader
+import csv.CSVHandler
 import csv.getCSVFiles
 import display.Display
 import entities.grade.Student
-import exceptions.NoCSVFile
-import exceptions.NoPathFound
-import main.MainArgs
+import utilities.MainArgs
 import org.slf4j.LoggerFactory
+import dao.DAOUtilities
 import java.io.File
 
 
+/**
+ * This is an application that takes in data of Resultados de Aprendizaje in the form of .csv files
+ * It calculates the grades of the students in the file
+ * Has the option to implement a database to store file data
+ *
+ * @param args: -mo =
+ *      modulo, -pi = .csv directory path,
+ *      -bd [d, q] = database options [d: delete all, q: show student database data]
+ */
 fun main(args: Array<String>) {
     val logger = LoggerFactory.getLogger("Main")
     val mainArgs = MainArgs(args)
     val path = mainArgs.getPath()
     val csvFiles: MutableList<File> = mutableListOf()
-    val csvReaders: MutableList<CSVReader> = mutableListOf()
+    val csvHandlers: MutableList<CSVHandler> = mutableListOf()
     var students: MutableList<Student> = mutableListOf()
 
-    if (path == null) throw NoPathFound
-    else
-    {
-        csvFiles.addAll(getCSVFiles(path))
+    //Adds files in directory to csvFiles
+    path?.let { pathString ->
+        csvFiles.addAll(getCSVFiles(pathString))
         logger.debug("CSVFiles created")
     }
 
-    if (csvFiles.isEmpty()) throw NoCSVFile
-    else {
-        csvFiles.forEach {
-            csvReaders.add(CSVReader(it))
-        }
-        logger.debug("CSVReaders created")
+    //Converts CSVFiles to CSVHandlers
+    csvFiles.forEach {
+        csvHandlers.add(CSVHandler(it))
     }
+    logger.debug("CSVReaders created")
 
+    //Creates tables
+    DAOUtilities.generateTables()
+    //If students in database assigns to students else student is emptyList
+    students = DAOUtilities.retrieveDBObjects()
+
+    //Extracts Data from CSVFiles and updates students with new grades
+    csvHandlers.forEach { csvHandler ->
+        val studentAssembler = StudentAssembler(csvHandler)
+        students = studentAssembler.getStudents(students, mainArgs.getModulo())
+        logger.debug("Students updated by CSV")
+        csvHandler.updateCSVFile(students, studentAssembler, mainArgs)
+    }
+    logger.debug("CSV data extracted to students")
+
+
+    //Determines database behaviour based on args
     when (mainArgs.getDB()) {
-        0 -> {
-            csvReaders.forEach { csvReader ->
-                val studentAssembler = StudentAssembler(csvReader)
-
-                students = studentAssembler.getStudents(students)
-                students.forEach { student ->
-                    studentAssembler.addStudentModulos(student, mainArgs.getModulo())
-                }
-                csvReader.updateCEGrades(students)
-                csvReader.updateRAGrades(students)
-                csvReader.writeNewGrades()
-            }
-            logger.debug("Students initiated through CSV")
+        "" -> {
+            students.let { DAOUtilities.createDBObjects(it)}
         }
-
-        1 -> {
-            csvReaders.forEach { csvReader ->
-                val studentAssembler = StudentAssembler(csvReader)
-
-                students = studentAssembler.getStudents(students)
-                students.forEach { student ->
-                    studentAssembler.addStudentModulos(student, mainArgs.getModulo())
-                }
-                csvReader.updateCEGrades(students)
-                csvReader.updateRAGrades(students)
-                csvReader.writeNewGrades()
-            }
-            logger.debug("Students initiated through CSV")
-            mainArgs.getDBOption(mainArgs.getDB(), students)
-        }
-        2 -> mainArgs.getDB()
-        3 -> {
-            mainArgs.getDBOption(mainArgs.getDB())?.let { dbStudents ->
-                students = dbStudents
-            }
-            logger.debug("Students initiated through db")
-        }
+        "d" -> DAOUtilities.deleteAll()
+        "q" -> students = DAOUtilities.retrieveDBObjects()
     }
+
+    //Displays student information in console
     students.forEach {student ->
         student.modulos.find { it.moduloName == mainArgs.getModulo() }?.let { modGrade ->
             Display.printTable(Display.toTable(student, modGrade))
@@ -81,4 +72,6 @@ fun main(args: Array<String>) {
         }
     }
 }
+
+
 
