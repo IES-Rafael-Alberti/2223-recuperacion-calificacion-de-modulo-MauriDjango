@@ -18,7 +18,7 @@ abstract class Grade(
 ) {
     //TODO Rename this because it doesn't really make sense...
     internal val subComponents: MutableList<Grade> = mutableListOf()
-    var gradeName = component.componentName
+    var gradeName = component.name
 
     /**
      * Calculates and returns the grade value for this grade.

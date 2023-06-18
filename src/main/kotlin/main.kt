@@ -1,4 +1,4 @@
-import Assembler.StudentAssembler
+import assembler.csvAssembler.CSVStudentAssembler
 import csv.CSVHandler
 import csv.getCSVFiles
 import display.Display
@@ -45,10 +45,10 @@ fun main(args: Array<String>) {
 
     //Extracts Data from CSVFiles and updates students with new grades
     csvHandlers.forEach { csvHandler ->
-        val studentAssembler = StudentAssembler(csvHandler)
-        students = studentAssembler.getStudents(students, mainArgs.getModulo())
+        val CSVStudentAssembler = CSVStudentAssembler(csvHandler)
+        students = CSVStudentAssembler.assemble(students, mainArgs.getModulo())
         logger.debug("Students updated by CSV")
-        csvHandler.updateCSVFile(students, studentAssembler, mainArgs)
+        csvHandler.updateCSVFile(students, CSVStudentAssembler, mainArgs)
     }
     logger.debug("CSV data extracted to students")
 

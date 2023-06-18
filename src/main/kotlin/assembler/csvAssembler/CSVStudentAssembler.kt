@@ -1,9 +1,9 @@
-package Assembler
+package assembler.csvAssembler
 
-import csv.CSVHandler
+import assembler.Assembler
+import dataSource.CSVDSource
 import entities.component.CEComponent
 import entities.component.InstrumentComponent
-import entities.component.ModuloComponent
 import entities.component.RAComponent
 import entities.grade.*
 import exceptions.StringToDoubleDefault
@@ -15,7 +15,7 @@ import exceptions.StudentEmpty
  *
  * @param csvHandler: An object that extracts the data in a .csv file
  */
-class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>() {
+class CSVStudentAssembler(private val connection: CSVDSource): Assembler<Student>() {
 
     /**
      * Creates a list of Student objects for
@@ -25,12 +25,12 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
      * @param students: A list of students that have already been created
      * @return students: The original list passed with new students added
      */
-    fun getStudents(students: MutableList<Student>, moduloName: String): MutableList<Student> {
+    private fun assembleStudent(students: MutableList<Student>, moduloName: String) {
 
-        csvHandler.getStudents().forEach { studentName ->
+        connection.getStudents().forEach { studentName ->
             students.find { it.name == studentName }?.let { student ->
                 addStudentModulos(student, moduloName)
-            } ?:run {
+            } ?: run {
                 Student(studentName).let { student ->
                     addStudentModulos(student, moduloName)
                     students.add(student)
@@ -38,7 +38,6 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
             }
         }
         if (students.isEmpty()) throw StudentEmpty
-        return students
     }
 
     /**
@@ -67,7 +66,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
      * @param moduloName: The name of the modulo being added
      */
     private fun newModulo(student: Student, moduloName: String): Modulo =
-        Modulo(moduloName, ModuloComponent(moduloName), student.id)
+
 
     /**
      * Attaches new RAGrades to a Modulo
@@ -81,7 +80,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
         val raComponent = raData?.let { RAComponent(it.first, stringToDouble(raData.second)) }
 
         raComponent?.let { raComp ->
-            modulo.subComponents.find { it.component.componentName == raComp.componentName }?.let { raGrade ->
+            modulo.subComponents.find { it.component.name == raComp.componentName }?.let { raGrade ->
                 getCEGrades(student, raGrade)
             } ?:run { -> raComp
                 RAGrade(raComp, modulo.id).let { raGrade ->
@@ -101,7 +100,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
     private fun getCEGrades(student: Student, raGrade: Grade) {
 
         csvHandler.getCeComponents().forEach { ceData ->
-            raGrade.subComponents.find { it.component.componentName == ceData.first }?.let { ceGrade ->
+            raGrade.subComponents.find { it.component.name == ceData.first }?.let { ceGrade ->
                 getInstrumentGrades(student, ceGrade)
             } ?:run {
                 CEComponent(ceData.first, stringToDouble(ceData.second)).let { ceComp ->
@@ -123,7 +122,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
     private fun getInstrumentGrades(student: Student, ce: Grade) {
 
         csvHandler.getInstrumentComponents().forEach { instCompData ->
-            ce.subComponents.find { it.component.componentName == instCompData.first }?.let { instGrade ->
+            ce.subComponents.find { it.component.name == instCompData.first }?.let { instGrade ->
                 csvHandler.getInstrumentGrade(student.name, instGrade.component)?.let { newGrade ->
                     (instGrade as? InstrumentGrade)?.setGrade(stringToDouble(newGrade))
                 }
@@ -165,4 +164,6 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
         return double as Double
     }
 }
+
+
 

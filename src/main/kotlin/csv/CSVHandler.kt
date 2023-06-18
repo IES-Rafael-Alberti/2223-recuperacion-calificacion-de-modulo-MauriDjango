@@ -1,6 +1,6 @@
 package csv
 
-import Assembler.StudentAssembler
+import assembler.csvAssembler.CSVStudentAssembler
 import bingo.inputoutput.exceptions.FileEmpty
 import entities.component.Component
 import entities.grade.Grade
@@ -184,7 +184,7 @@ class CSVHandler(private val csvFile: File) {
      *
      * @return ceList: List of Pair<name: String, percentage: String>
      */
-    fun getCeComponents(): MutableList<Pair<String, String>> {
+    fun getCEComponents(): MutableList<Pair<String, String>> {
         val ceRegex = Regex("UD\\d*\\.([a-z])")
         val ceList: MutableList<Pair<String, String>> = mutableListOf()
 
@@ -265,7 +265,7 @@ class CSVHandler(private val csvFile: File) {
                     linesList[index].forEach { element ->
                         instrumentRegex.find(element)?.let { instMatch ->
                             if (studentIndex != null && raPercentIndex !== null) {
-                                if (component.componentName == "($element)${instNameMatch.groupValues[2]}") {
+                                if (component.name == "($element)${instNameMatch.groupValues[2]}") {
                                     grade = linesList[index][studentIndex]
                                 }
                             }
@@ -302,7 +302,7 @@ class CSVHandler(private val csvFile: File) {
         students.forEach { student ->
             student.modulos.forEach { modulo ->
                 modulo.subComponents.forEach { raGrade ->
-                    if (raGrade.component.componentName == ra) {
+                    if (raGrade.component.name == ra) {
                         mathcedRAGrade = raGrade
                     }
                 }
@@ -310,7 +310,7 @@ class CSVHandler(private val csvFile: File) {
 
             findIndex(student.name)?.let { studentIndex ->
                 mathcedRAGrade?.subComponents?.forEach { ce ->
-                    findCEIndex(ce.component.componentName)?.let { ceIndex ->
+                    findCEIndex(ce.component.name)?.let { ceIndex ->
                         newLinesList[ceIndex][studentIndex] = ce.getGrade().toString()
                     }
                 }
@@ -333,7 +333,7 @@ class CSVHandler(private val csvFile: File) {
         students.forEach { student ->
             student.modulos.forEach { modulo ->
                 modulo.subComponents.forEach { raGrade ->
-                    if (raGrade.component.componentName == ra) {
+                    if (raGrade.component.name == ra) {
                         mathcedRAGrade = raGrade
                     }
                 }
@@ -341,7 +341,7 @@ class CSVHandler(private val csvFile: File) {
 
             findIndex(student.name)?.let { studentIndex ->
                 mathcedRAGrade?.let {raGrade ->
-                    findRAIndex(raGrade.component.componentName)?.let { raIndex ->
+                    findRAIndex(raGrade.component.name)?.let { raIndex ->
                         newLinesList[raIndex][studentIndex] = mathcedRAGrade?.getGrade().toString()
                     }
                 }
@@ -375,12 +375,12 @@ class CSVHandler(private val csvFile: File) {
      * Updates the CSV file with the latest grades of the students.
      *
      * @param students The list of students whose grades need to be updated.
-     * @param studentAssembler The student assembler used to assemble the student data.
+     * @param CSVStudentAssembler The student assembler used to assemble the student data.
      * @param mainArgs The main arguments containing the necessary file paths and configurations.
      */
     fun updateCSVFile(
         students: MutableList<Student>,
-        studentAssembler: StudentAssembler,
+        CSVStudentAssembler: CSVStudentAssembler,
         mainArgs: MainArgs,
     ) {
 

@@ -17,7 +17,7 @@ const val dbArgument = "-bd"
  * @param args: Arguments passed to main
  * @property logger: Logger
  */
-class MainArgs(private val args: Array<String>) {
+object MainArgs {
     private val logger = LoggerFactory.getLogger("MainArgs")
 
     /**
@@ -26,7 +26,7 @@ class MainArgs(private val args: Array<String>) {
      *
      * @return modulo: Name of the modulo
      */
-    fun getModulo(): String {
+    fun getModulo(args: Array<String>): String {
         var modulo: String = "PRO"
         if (moduloArgument in args) {
             modulo = args[args.indexOf(moduloArgument) + 1]
@@ -39,7 +39,7 @@ class MainArgs(private val args: Array<String>) {
      *
      * @return path: Path if found in args or null
      */
-    fun getPath(): String? {
+    fun getPath(args: Array<String>): String? {
         var path: String? = null
         if (pathArgument in args) {
             path = args[args.indexOf(pathArgument) + 1]
@@ -53,7 +53,7 @@ class MainArgs(private val args: Array<String>) {
      *
      * @return option =
      */
-    fun getDB(): String? {
+    fun getDB(args: Array<String>): String? {
         var option: String? = null
         try {
             if (dbArgument in args) {
