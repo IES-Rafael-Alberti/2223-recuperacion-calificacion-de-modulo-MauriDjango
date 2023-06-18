@@ -1,12 +1,10 @@
 package csv
 
-import assembler.csvAssembler.CSVUtil
 import bingo.inputoutput.exceptions.FileEmpty
 import entities.component.Component
 import entities.grade.Grade
 import entities.grade.Student
 import exceptions.*
-import utilities.MainArgs
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.lang.Exception
@@ -251,7 +249,6 @@ class CSVHandler(private val csvFile: File) {
      */
     fun getInstrumentComponents(): MutableList<Pair<String, String>> {
         val instrumentRegex = Regex("([a-z],[a-z])")
-        val instrumentNameRegex = Regex("([a-z],[a-z])\\D+([\\d\\+]+)")
         val instruments = mutableListOf<Pair<String, String>>()
 
                     linesList.forEach { line ->
@@ -286,13 +283,12 @@ class CSVHandler(private val csvFile: File) {
      */
     fun getInstrumentGrade(studentName: String, component: Component): String? {
         var grade: String? = null
-        val studentIndex = findIndex(studentName)
         val instrumentRegex = Regex("([a-z],[a-z])")
 
         linesList.forEach { line ->
             line.forEach { element ->
                 instrumentRegex.find(element)?.let {
-                    if (studentIndex != null && raPercentIndex != null) {
+                    findIndex(studentName)?.let { studentIndex ->
                         if (component.name == "${element}${linesList.indexOf(line)}") {
                             grade = line[studentIndex]
                         }
@@ -314,19 +310,19 @@ class CSVHandler(private val csvFile: File) {
     fun updateCEGrades(students: MutableList<Student>) {
         val ra: String? = getRAComponent()?.first
         val newLinesList: MutableList<MutableList<String>> = linesList.toMutableList()
-        var mathcedRAGrade: Grade? = null
+        var matchedRAGrades: Grade? = null
 
         students.forEach { student ->
             student.modulos.forEach { modulo ->
                 modulo.subComponents.forEach { raGrade ->
                     if (raGrade.component.name == ra) {
-                        mathcedRAGrade = raGrade
+                        matchedRAGrades = raGrade
                     }
                 }
             }
 
             findIndex(student.name)?.let { studentIndex ->
-                mathcedRAGrade?.subComponents?.forEach { ce ->
+                matchedRAGrades?.subComponents?.forEach { ce ->
                     findCEIndex(ce.component.name)?.let { ceIndex ->
                         newLinesList[ceIndex][studentIndex] = ce.getGrade().toString()
                     }
@@ -401,5 +397,16 @@ class CSVHandler(private val csvFile: File) {
         updateRAGrades(students)
         overwriteFile()
         logger.debug("CSVFile updated")
+    }
+
+    fun getStudentInitials(studentName: String): String {
+        var studentInitials = ""
+        linesList.forEach { line ->
+            line.find { it == studentName }?.let {
+                line.indexOf(studentName) }?.let {studentIndex ->
+                    studentInitials = linesList[0][studentIndex]
+                }
+            }
+        return studentInitials
     }
 }

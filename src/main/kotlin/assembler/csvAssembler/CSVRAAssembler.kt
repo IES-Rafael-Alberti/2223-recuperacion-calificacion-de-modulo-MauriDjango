@@ -7,8 +7,18 @@ import entities.grade.Modulo
 import entities.grade.RAGrade
 
 
+/**
+ * CSVRAAssemblerStudent is responsible for assembling CSV data for the RA (Responsible Authority) component of a Modulo.
+ *
+ * @property connection The CSVDSource connection for retrieving CSV data.
+ */
 class CSVRAAssemblerStudent(private val connection: CSVDSource): Assembler<Modulo>() {
 
+    /**
+     * Assembles CSV data for the RA component of the specified Modulo.
+     *
+     * @param component The Modulo to assemble the RA component for.
+     */
     override fun assemble(component: Modulo) {
 
         connection.getRAComponent()?.let { raCompData ->

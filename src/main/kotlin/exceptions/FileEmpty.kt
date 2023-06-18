@@ -1,5 +1,5 @@
 package bingo.inputoutput.exceptions
 
 object FileEmpty : Throwable() {
-    val msg = "CSV file was accedsed but was empty."
+    override val message = "CSV file was accedsed but was empty."
 }

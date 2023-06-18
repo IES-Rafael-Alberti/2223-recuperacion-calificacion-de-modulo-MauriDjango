@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 object DAOUtilities {
     val logger = LoggerFactory.getLogger("DAOUtilities")
 
-
     /**
      * Generates database tables for various entities.
      */

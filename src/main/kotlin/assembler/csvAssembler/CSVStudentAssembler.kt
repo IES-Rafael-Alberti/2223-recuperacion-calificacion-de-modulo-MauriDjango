@@ -7,30 +7,36 @@ import exceptions.StudentEmpty
 
 
 /**
- * This class inherits from Assembler so that we know what it's purpose is (To assemble)
+ * CSVStudentAssembler is responsible for assembling CSV data for Student objects.
  *
- * @param csvHandler: An object that extracts the data in a .csv file
+ * @property connection The CSVDSource connection for retrieving CSV data.
  */
 class CSVStudentAssembler(private val connection: CSVDSource): Assembler<Student>() {
 
     /**
-     * Creates a list of Student objects for
-     * each student name found in the CSVHandler that is not already in existingStudents by name
-     * and the students objects that are already stored in students
+     * Creates a list of Student objects for each student name found in the CSVHandler that is not already in existingStudents by name
+     * and the students objects that are already stored in students.
      *
-     * @param students: A list of students that have already been created
-     * @return students: The original list passed with new students added
+     * @param component The Student object to assemble.
      */
     override fun assemble(component: Student) {
         TODO("NOT YET IMPLEMENTED")
     }
 
+    /**
+     * Updates the list of students with new students from the CSVHandler that are not already present.
+     *
+     * @param students The list of students that have already been created.
+     * @throws StudentEmptyException if no students are found in the CSVHandler.
+     */
     fun updateStudents(students: MutableList<Student>) {
 
         connection.getStudents().forEach { studentName ->
             students.find { it.name == studentName } ?: run {
-                Student(studentName).let{ student ->
-                    students.add(student)
+                connection.getStudentInitials(studentName).let { initials ->
+                    Student(studentName, initials).let { student ->
+                        students.add(student)
+                    }
                 }
             }
         }

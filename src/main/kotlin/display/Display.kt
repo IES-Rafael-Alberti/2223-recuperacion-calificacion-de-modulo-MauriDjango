@@ -25,7 +25,7 @@ object Display {
 
             return table {
                 header(
-                    "Name",
+                    student.initials,
                     student.name
                 )
                 row(
