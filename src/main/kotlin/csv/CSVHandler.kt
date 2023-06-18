@@ -1,6 +1,6 @@
 package csv
 
-import assembler.csvAssembler.CSVStudentAssembler
+import assembler.csvAssembler.CSVUtil
 import bingo.inputoutput.exceptions.FileEmpty
 import entities.component.Component
 import entities.grade.Grade
@@ -31,15 +31,22 @@ import java.lang.StringBuilder
 class CSVHandler(private val csvFile: File) {
     private val logger = LoggerFactory.getLogger("CSVDAO")
     private var lines: List<String> = csvFile.readLines()
+    private var linesList: MutableList<MutableList<String>>
+    private var raPercentage: Double? = null
+    private var raPercentIndex: Int? = null
+    private var cePercentIndex: Int? = null
+    private var gradeSectionIndex: Int? = null
 
     init {
         if (lines.isEmpty()) throw FileEmpty
-    }
+        linesList = linesToList()
+        raPercentIndex = findIndex("%RA")
+        cePercentIndex = findIndex("%CE")?.plus(1)
+        gradeSectionIndex = findIndex("%RA")?.plus(1)
+        raPercentage = getRAPercentage()
 
-    private val linesList: MutableList<MutableList<String>> = linesToList()
-    private val raPercentIndex = findIndex("%RA")
-    private val cePercentIndex = findIndex("%CE")?.plus(1)
-    private val gradeSectionIndex = findIndex("%RA")?.plus(1)
+
+    }
 
     /**
      * Finds the index of a passed string
@@ -161,22 +168,49 @@ class CSVHandler(private val csvFile: File) {
      *
      * @return ra: Pair<name: String, percentage: String>
      */
-    fun getRAComponent(): Pair<String, String>? {
+    fun getRAComponent(): Pair<String, Double>? {
         val raRegex = Regex("RA(\\d)")
-        var ra: Pair<String, String>? = null
+        var ra: Pair<String, Double>? = null
 
         linesList.forEach { line ->
             line.forEach { element ->
                 raRegex.matchEntire(element)?.let { matchResult ->
                     if (raPercentIndex != null) {
-                        if (ra == null) ra = Pair(matchResult.groupValues[1], line[raPercentIndex])
-                        else throw MultipleRAComponentsFound
+                        ra?.let { ra ->
+                        if (ra.first != matchResult.groupValues[1]) throw MultipleRAComponentsFound
+                        }
+                        raPercentage?.let { ra = Pair(matchResult.groupValues[1], it) }
                     }
                 }
             }
         }
         if (ra == null) throw NoRAFound
         return ra
+    }
+
+    /**
+     * Retrieves the percentage value for a specific RA (Resultado Aprendizaje) from the lines list.
+     *
+     * The function iterates through each line in the lines list and searches for a matching element that
+     * represents a RA using the "UD" pattern followed by digits. If a match is found, the function extracts
+     * the percentage value from the specified column index and returns it as a Double.
+     *
+     * @return The percentage value for the RA, or null if it couldn't be found.
+     * @throws NoRAPercentFound if no percentage value for the RA was found in the lines list.
+     */
+    private fun getRAPercentage(): Double? {
+        val udRegexRow = Regex("UD\\d+")
+        var percentage: Double? = null
+
+        linesList.forEach { line ->
+            line.forEach { element ->
+                udRegexRow.matchEntire(element)?.let {
+                    raPercentIndex?.let { percentage = CSVUtil.stringToDouble(line[it]) }
+                }
+            }
+        }
+        percentage?: {throw NoRAPercentFound }
+        return percentage
     }
 
     /**
@@ -192,14 +226,14 @@ class CSVHandler(private val csvFile: File) {
             linesList.forEach() { line ->
                 line.forEach() { element ->
                     ceRegex.find(element)?.let {
-                        if (cePercentIndex != null) {
+                        cePercentIndex?.let { percent ->
                             ceList.add(
                                 Pair(
                                     it.groupValues[1],
-                                    line[cePercentIndex]
+                                    line[percent]
                                 )
                             )
-                        } else throw CEPercentIndex
+                        }
                     }
                 }
             }
@@ -220,26 +254,23 @@ class CSVHandler(private val csvFile: File) {
         val instrumentNameRegex = Regex("([a-z],[a-z])\\D+([\\d\\+]+)")
         val instruments = mutableListOf<Pair<String, String>>()
 
-        lines.forEach { line ->
-            instrumentNameRegex.find(line)?.let { instNameMatch ->
-                lines.indexOf(line).let { index ->
-                    linesList[index].forEach { element ->
-                        instrumentRegex.find(element)?.let { instMatch ->
-                            if (raPercentIndex != null) {
-                                instruments.add(
-                                    Pair(
-                                        "($element)${instNameMatch.groupValues[2]}",
-                                        linesList[index][raPercentIndex]
+                    linesList.forEach { line ->
+                        line.forEach { element ->
+                            instrumentRegex.find(element)?.let { instMatch ->
+                                raPercentIndex?.let { percentIndex ->
+                                    instruments.add(
+                                        Pair(
+                                            "${element}${linesList.indexOf(line)}",
+                                            line[percentIndex]
+                                        )
                                     )
-                                )
-                            } else throw RAPercentIndex
+                                }
+                            }
                         }
                     }
 
-                }
-            }
 
-        }
+
         if (instruments.isEmpty()) {
             throw InstrumentComponentsEmpty
         }
@@ -257,35 +288,21 @@ class CSVHandler(private val csvFile: File) {
         var grade: String? = null
         val studentIndex = findIndex(studentName)
         val instrumentRegex = Regex("([a-z],[a-z])")
-        val instrumentNameRegex = Regex("([a-z],[a-z])\\D+([\\d\\+]+)")
 
-        lines.forEach { line ->
-            instrumentNameRegex.find(line)?.let { instNameMatch ->
-                lines.indexOf(line).let { index ->
-                    linesList[index].forEach { element ->
-                        instrumentRegex.find(element)?.let { instMatch ->
-                            if (studentIndex != null && raPercentIndex !== null) {
-                                if (component.name == "($element)${instNameMatch.groupValues[2]}") {
-                                    grade = linesList[index][studentIndex]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-/*        linesList.forEach { line ->
+        linesList.forEach { line ->
             line.forEach { element ->
                 instrumentRegex.find(element)?.let {
-                    if (component.componentName == element) {
-                        if (studentIndex != null && raPercentIndex !== null) {
+                    if (studentIndex != null && raPercentIndex != null) {
+                        if (component.name == "${element}${linesList.indexOf(line)}") {
                             grade = line[studentIndex]
                         }
                     }
                 }
             }
-        }*/
-        if (grade == null) throw InstrumentGradeEmpty
+        }
+        if (grade == null) {
+            throw InstrumentGradeEmpty
+        }
         return grade
     }
 
@@ -375,13 +392,9 @@ class CSVHandler(private val csvFile: File) {
      * Updates the CSV file with the latest grades of the students.
      *
      * @param students The list of students whose grades need to be updated.
-     * @param CSVStudentAssembler The student assembler used to assemble the student data.
-     * @param mainArgs The main arguments containing the necessary file paths and configurations.
      */
     fun updateCSVFile(
         students: MutableList<Student>,
-        CSVStudentAssembler: CSVStudentAssembler,
-        mainArgs: MainArgs,
     ) {
 
         updateCEGrades(students)

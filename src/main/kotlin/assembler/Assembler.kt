@@ -1,5 +1,7 @@
 package assembler
 
+import entities.grade.Grade
+
 
 /**
  * This class helps with the instantiation of multiple classes that are related to each other

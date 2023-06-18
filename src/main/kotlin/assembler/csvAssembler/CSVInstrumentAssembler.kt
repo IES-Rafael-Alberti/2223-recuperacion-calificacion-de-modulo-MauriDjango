@@ -3,11 +3,8 @@ package assembler.csvAssembler
 import assembler.Assembler
 import csv.CSVUtil
 import dataSource.CSVDSource
-import entities.component.CEComponent
-import entities.component.Component
 import entities.component.InstrumentComponent
 import entities.grade.*
-import exceptions.InstrumentGradeEmpty
 
 class CSVInstrumentAssembler(private val connection: CSVDSource): Assembler<CEGrade>() {
 

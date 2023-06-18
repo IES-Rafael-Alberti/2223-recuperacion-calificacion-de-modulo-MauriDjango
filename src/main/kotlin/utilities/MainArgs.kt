@@ -96,7 +96,7 @@ object MainArgs {
 
         return when (option) {
             1 -> {
-                students?.let { DAOUtilities.createDBObjects(it)}
+                students?.let { DAOUtilities.insertDBObjects(it)}
                 return null
             }
             2 -> {
