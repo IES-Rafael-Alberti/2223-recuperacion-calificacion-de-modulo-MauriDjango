@@ -78,7 +78,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
      */
     private fun getRAGrades(student: Student, modulo: Modulo) {
         val raData = csvHandler.getRAComponent()
-        val raComponent = raData?.let { RAComponent(it.first, stringToDouble(raData.second)) }
+        val raComponent = raData?.let { RAComponent(it.first, raData.second) }
 
         raComponent?.let { raComp ->
             modulo.subComponents.find { it.component.componentName == raComp.componentName }?.let { raGrade ->
@@ -104,7 +104,7 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
             raGrade.subComponents.find { it.component.componentName == ceData.first }?.let { ceGrade ->
                 getInstrumentGrades(student, ceGrade)
             } ?:run {
-                CEComponent(ceData.first, stringToDouble(ceData.second)).let { ceComp ->
+                CEComponent(ceData.first, CSVUtil.stringToDouble(ceData.second)).let { ceComp ->
                     CEGrade(ceComp, raGrade.id).let { ceGrade ->
                         getInstrumentGrades(student, ceGrade)
                         raGrade.subComponents.add(ceGrade)
@@ -125,14 +125,14 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
         csvHandler.getInstrumentComponents().forEach { instCompData ->
             ce.subComponents.find { it.component.componentName == instCompData.first }?.let { instGrade ->
                 csvHandler.getInstrumentGrade(student.name, instGrade.component)?.let { newGrade ->
-                    (instGrade as? InstrumentGrade)?.setGrade(stringToDouble(newGrade))
+                    (instGrade as? InstrumentGrade)?.setGrade(CSVUtil.stringToDouble(newGrade))
                 }
             } ?: run {
                 if (ce.gradeName in instCompData.first) {
-                    InstrumentComponent(instCompData.first, stringToDouble(instCompData.second)).let { instComp ->
+                    InstrumentComponent(instCompData.first, CSVUtil.stringToDouble(instCompData.second)).let { instComp ->
                         InstrumentGrade(instComp, grade = 0.0, ce.id).let { instGrade ->
                             csvHandler.getInstrumentGrade(student.name, instGrade.component)?.let { newGrade ->
-                                (instGrade as? InstrumentGrade)?.setGrade(stringToDouble(newGrade))
+                                (instGrade as? InstrumentGrade)?.setGrade(CSVUtil.stringToDouble(newGrade))
                             }
                             ce.subComponents.add(instGrade)
                         }
@@ -140,29 +140,6 @@ class StudentAssembler(private val csvHandler: CSVHandler): Assembler<Student>()
                 }
             }
         }
-    }
-
-
-    /**
-     * Converts a string containing a number or decimal into a double
-     * If no number is found with the regex it returns null
-     *
-     * @param string: The string to be converted
-     * @return double: The double extracted from the string
-     */
-    private fun stringToDouble(string: String): Double {
-        val percentRegex = Regex("(\\d+,?\\d*)")
-        var double: Double? = null
-
-        percentRegex.find(string)?.let { match ->
-            double = match.groupValues[1].replace(',','.').toDouble()
-        }
-
-        if (double == null) {
-            double = 0.00
-            throw StringToDoubleDefault
-        }
-        return double as Double
     }
 }
 

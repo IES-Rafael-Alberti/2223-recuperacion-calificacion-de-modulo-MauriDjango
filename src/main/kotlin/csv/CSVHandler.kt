@@ -1,5 +1,6 @@
 package csv
 
+import Assembler.CSVUtil
 import Assembler.StudentAssembler
 import bingo.inputoutput.exceptions.FileEmpty
 import entities.component.Component
@@ -31,15 +32,22 @@ import java.lang.StringBuilder
 class CSVHandler(private val csvFile: File) {
     private val logger = LoggerFactory.getLogger("CSVDAO")
     private var lines: List<String> = csvFile.readLines()
+    private var linesList: MutableList<MutableList<String>>
+    private var raPercentage: Double? = null
+    private var raPercentIndex: Int? = null
+    private var cePercentIndex: Int? = null
+    private var gradeSectionIndex: Int? = null
 
     init {
         if (lines.isEmpty()) throw FileEmpty
-    }
+        linesList = linesToList()
+        raPercentIndex = findIndex("%RA")
+        cePercentIndex = findIndex("%CE")?.plus(1)
+        gradeSectionIndex = findIndex("%RA")?.plus(1)
+        raPercentage = getRAPercetnage()
 
-    private val linesList: MutableList<MutableList<String>> = linesToList()
-    private val raPercentIndex = findIndex("%RA")
-    private val cePercentIndex = findIndex("%CE")?.plus(1)
-    private val gradeSectionIndex = findIndex("%RA")?.plus(1)
+
+    }
 
     /**
      * Finds the index of a passed string
@@ -161,22 +169,39 @@ class CSVHandler(private val csvFile: File) {
      *
      * @return ra: Pair<name: String, percentage: String>
      */
-    fun getRAComponent(): Pair<String, String>? {
+    fun getRAComponent(): Pair<String, Double>? {
         val raRegex = Regex("RA(\\d)")
-        var ra: Pair<String, String>? = null
+        var ra: Pair<String, Double>? = null
 
         linesList.forEach { line ->
             line.forEach { element ->
                 raRegex.matchEntire(element)?.let { matchResult ->
                     if (raPercentIndex != null) {
-                        if (ra == null) ra = Pair(matchResult.groupValues[1], line[raPercentIndex])
-                        else throw MultipleRAComponentsFound
+                        ra?.let { ra ->
+                        if (ra.first != matchResult.groupValues[1]) throw MultipleRAComponentsFound
+                        }
+                        raPercentage?.let { ra = Pair(matchResult.groupValues[1], it) }
                     }
                 }
             }
         }
         if (ra == null) throw NoRAFound
         return ra
+    }
+
+    private fun getRAPercetnage(): Double? {
+        val udRegexRow = Regex("UD\\d+")
+        var percentage: Double? = null
+
+        linesList.forEach { line ->
+            line.forEach { element ->
+                udRegexRow.matchEntire(element)?.let {
+                    raPercentIndex?.let { percentage = CSVUtil.stringToDouble(line[it]) }
+                }
+            }
+        }
+        percentage?: {throw NoRAPercentFound }
+        return percentage
     }
 
     /**
@@ -192,14 +217,14 @@ class CSVHandler(private val csvFile: File) {
             linesList.forEach() { line ->
                 line.forEach() { element ->
                     ceRegex.find(element)?.let {
-                        if (cePercentIndex != null) {
+                        cePercentIndex?.let { percent ->
                             ceList.add(
                                 Pair(
                                     it.groupValues[1],
-                                    line[cePercentIndex]
+                                    line[percent]
                                 )
                             )
-                        } else throw CEPercentIndex
+                        }
                     }
                 }
             }
@@ -225,14 +250,14 @@ class CSVHandler(private val csvFile: File) {
                 lines.indexOf(line).let { index ->
                     linesList[index].forEach { element ->
                         instrumentRegex.find(element)?.let { instMatch ->
-                            if (raPercentIndex != null) {
+                            raPercentIndex?.let { percent ->
                                 instruments.add(
                                     Pair(
                                         "($element)${instNameMatch.groupValues[2]}",
-                                        linesList[index][raPercentIndex]
+                                        linesList[index][percent]
                                     )
                                 )
-                            } else throw RAPercentIndex
+                            }
                         }
                     }
 
@@ -274,17 +299,6 @@ class CSVHandler(private val csvFile: File) {
                 }
             }
         }
-/*        linesList.forEach { line ->
-            line.forEach { element ->
-                instrumentRegex.find(element)?.let {
-                    if (component.componentName == element) {
-                        if (studentIndex != null && raPercentIndex !== null) {
-                            grade = line[studentIndex]
-                        }
-                    }
-                }
-            }
-        }*/
         if (grade == null) throw InstrumentGradeEmpty
         return grade
     }
