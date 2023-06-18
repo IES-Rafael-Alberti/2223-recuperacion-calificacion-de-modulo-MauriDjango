@@ -55,6 +55,7 @@ fun main(args: Array<String>) {
     //Extracts Data from CSVFiles and updates students with new grades
     csvDSources.forEach { csvDSource ->
         CSVAssemblerImpl(csvDSource, MainArgs.getModulo(args), students).assembleAll()
+        csvDSource.updateCSV(students)
     }
     logger.debug("CSV data extracted into students")
 

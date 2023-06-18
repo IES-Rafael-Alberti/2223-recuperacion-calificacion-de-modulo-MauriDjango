@@ -96,7 +96,7 @@ class CSVHandler(private val csvFile: File) {
      * @param string: RA name to be matched
      * @return index: Index if found or null if not found
      */
-    private fun findRAIndex(string: String): Int? {
+    private fun findRAIndex(): Int? {
         val raRegex = Regex("RA(\\d)")
         var index: Int? = null
 
@@ -353,8 +353,8 @@ class CSVHandler(private val csvFile: File) {
             }
 
             findIndex(student.name)?.let { studentIndex ->
-                mathcedRAGrade?.let {raGrade ->
-                    findRAIndex(raGrade.component.name)?.let { raIndex ->
+                mathcedRAGrade?.let {
+                    findRAIndex()?.let { raIndex ->
                         newLinesList[raIndex][studentIndex] = mathcedRAGrade?.getGrade().toString()
                     }
                 }
@@ -367,7 +367,7 @@ class CSVHandler(private val csvFile: File) {
     /**
      * Overwrites csvFile contents using linesList property
      */
-    fun overwriteFile() {
+    private fun overwriteFile() {
         val fileWriter = csvFile.bufferedWriter()
 
         fileWriter.use { writer ->

@@ -1,6 +1,7 @@
 package dataSource
 
 import entities.component.Component
+import entities.grade.Student
 
 
 /**
@@ -49,6 +50,6 @@ class CSVDSource(connection: csv.CSVHandler): DSource<csv.CSVHandler>(connection
 
     fun getStudentInitials(studentName: String): String = connection.getStudentInitials(studentName)
 
-
+    fun updateCSV(students: MutableList<Student>) = connection.updateCSVFile(students)
 }
 
