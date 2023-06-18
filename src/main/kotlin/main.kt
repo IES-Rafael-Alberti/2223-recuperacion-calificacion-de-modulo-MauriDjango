@@ -1,4 +1,4 @@
-import Assembler.StudentAssembler
+import assembler.csvAssembler.CSVAssemblerImpl
 import csv.CSVHandler
 import csv.getCSVFiles
 import display.Display
@@ -6,6 +6,7 @@ import entities.grade.Student
 import utilities.MainArgs
 import org.slf4j.LoggerFactory
 import dao.DAOUtilities
+import dataSource.CSVDSource
 import java.io.File
 
 
@@ -20,10 +21,10 @@ import java.io.File
  */
 fun main(args: Array<String>) {
     val logger = LoggerFactory.getLogger("Main")
-    val mainArgs = MainArgs(args)
-    val path = mainArgs.getPath()
+    val path = MainArgs.getPath(args)
     val csvFiles: MutableList<File> = mutableListOf()
     val csvHandlers: MutableList<CSVHandler> = mutableListOf()
+    val csvDSources: MutableList<CSVDSource> = mutableListOf()
     var students: MutableList<Student> = mutableListOf()
 
     //Adds files in directory to csvFiles
@@ -33,38 +34,41 @@ fun main(args: Array<String>) {
     }
 
     //Converts CSVFiles to CSVHandlers
-    csvFiles.forEach {
-        csvHandlers.add(CSVHandler(it))
+    csvFiles.forEach { csvFile ->
+        CSVHandler(csvFile).let {csvHandler ->
+            CSVDSource(csvHandler).let { csvDSource ->
+                csvDSources.add(csvDSource)
+            }
+        }
     }
     logger.debug("CSVReaders created")
 
+    //This next part of database accessing is done regardless if the db option has been selected or not
+    //to avoid unnecessarily creating multiple instances of the same object
+
     //Creates tables
     DAOUtilities.generateTables()
-    //If students in database assigns to students else student is emptyList
+
+    //If students in database assigns to students else students is emptyList
     students = DAOUtilities.retrieveDBObjects()
 
     //Extracts Data from CSVFiles and updates students with new grades
-    csvHandlers.forEach { csvHandler ->
-        val studentAssembler = StudentAssembler(csvHandler)
-        students = studentAssembler.getStudents(students, mainArgs.getModulo())
-        logger.debug("Students updated by CSV")
-        csvHandler.updateCSVFile(students, studentAssembler, mainArgs)
+    csvDSources.forEach { csvDSource ->
+        CSVAssemblerImpl(csvDSource, MainArgs.getModulo(args), students).assembleAll()
+        csvDSource.updateCSV(students)
     }
-    logger.debug("CSV data extracted to students")
-
+    logger.debug("CSV data extracted into students")
 
     //Determines database behaviour based on args
-    when (mainArgs.getDB()) {
-        "" -> {
-            students.let { DAOUtilities.createDBObjects(it)}
-        }
+    when (MainArgs.getDB(args)) {
+        "" -> DAOUtilities.insertDBObjects(students)
         "d" -> DAOUtilities.deleteAll()
         "q" -> students = DAOUtilities.retrieveDBObjects()
     }
 
     //Displays student information in console
     students.forEach {student ->
-        student.modulos.find { it.moduloName == mainArgs.getModulo() }?.let { modGrade ->
+        student.modulos.find { it.moduloName == MainArgs.getModulo(args) }?.let { modGrade ->
             Display.printTable(Display.toTable(student, modGrade))
             modGrade.subComponents.forEach { raGrade ->
                 Display.printTable(Display.toTable(raGrade))

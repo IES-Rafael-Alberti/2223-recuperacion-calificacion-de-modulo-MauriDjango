@@ -3,7 +3,6 @@ package dao
 import entities.component.InstrumentComponent
 import entities.grade.Grade
 import entities.grade.InstrumentGrade
-import exceptions.StudentEmpty
 import hikarih2ds
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -29,7 +28,7 @@ class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
              dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     stmt.setString(1, t.id.toString())
-                    stmt.setString(2, t.component.componentName)
+                    stmt.setString(2, t.component.name)
                     stmt.setString(3, t.superComponentID.toString())
                     stmt.setDouble(4, t.getGrade())
                     stmt.setDouble(5, t.component.percentage)

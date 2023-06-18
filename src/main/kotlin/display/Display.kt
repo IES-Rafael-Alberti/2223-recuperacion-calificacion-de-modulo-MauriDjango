@@ -25,7 +25,7 @@ object Display {
 
             return table {
                 header(
-                    "Name",
+                    student.initials,
                     student.name
                 )
                 row(
@@ -53,14 +53,14 @@ object Display {
 
             return table {
                 header(
-                    "RA" + raGrade.component.componentName,
+                    "RA" + raGrade.component.name,
                     "Percentage: " + raGrade.component.percentage.toString(),
                     "Grade: " + raGrade.getGrade().toString()
                 )
 
                 raGrade.subComponents.forEach { ce ->
                     row(
-                        "CE." + ce.component.componentName,
+                        "CE." + ce.component.name,
                         ce.component.percentage.toString(),
                         ce.getGrade().toString()
                     )

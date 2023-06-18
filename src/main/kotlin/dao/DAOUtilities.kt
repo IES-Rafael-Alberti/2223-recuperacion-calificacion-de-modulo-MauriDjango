@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 object DAOUtilities {
     val logger = LoggerFactory.getLogger("DAOUtilities")
 
-
     /**
      * Generates database tables for various entities.
      */
@@ -29,7 +28,7 @@ object DAOUtilities {
      *
      * @param students The list of students to create in the database.
      */
-    fun createDBObjects(students: MutableList<Student>) {
+    fun insertDBObjects(students: MutableList<Student>) {
 
         students.forEach { student ->
             studentDAO.create(student)

@@ -25,11 +25,12 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
 
     override fun create(t: Student): Student {
         try {
-            val sql = "INSERT INTO STUDENT (id, studentname) VALUES (?, ?)"
+            val sql = "INSERT INTO STUDENT (id, studentname, initials) VALUES (?, ?, ?)"
             dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     stmt.setString(1, t.id.toString())
                     stmt.setString(2, t.name)
+                    stmt.setString(3, t.initials)
                     stmt.execute()
                 }
             }
@@ -42,7 +43,7 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
     override fun createTable() {
         try {
             val sql =
-                "CREATE TABLE STUDENT (id VARCHAR(50) PRIMARY KEY , studentName VARCHAR(100));"
+                "CREATE TABLE STUDENT (id VARCHAR(50) PRIMARY KEY , studentName VARCHAR(100), initials VARCHAR(4));"
             dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
                     val result = stmt.executeUpdate()
@@ -84,6 +85,7 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
                     students.add(
                         Student(
                             name = resultSet.getString("studentName"),
+                            initials = resultSet.getString("Initials"),
                             id = UUID.fromString(resultSet.getString("id"))
                         )
                     )
