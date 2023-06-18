@@ -1,21 +1,6 @@
 package Assembler
 
-import csv.CSVReader
-import exceptions.StringToDoubleDefault
-
-abstract class Assembler<T>(csvReader: CSVReader) {
-    fun stringToDouble(string: String): Double {
-        val percentRegex = Regex("(\\d+,?\\d*)")
-        var double: Double? = null
-
-        percentRegex.find(string)?.let { match ->
-            double = match.groupValues[1].replace(',','.').toDouble()
-        }
-
-        if (double == null) {
-            double = 0.00
-            throw StringToDoubleDefault
-        }
-        return double as Double
-    }
-}
+/**
+ * This class helps with the instantiation of multiple classes that are related to each other
+ */
+abstract class Assembler<T>()

@@ -1,11 +1,8 @@
 package dao
 
 import entities.component.CEComponent
-import entities.component.ModuloComponent
 import entities.grade.CEGrade
 import entities.grade.Grade
-import entities.grade.RAGrade
-import exceptions.StudentEmpty
 import hikarih2ds
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -15,6 +12,13 @@ import javax.sql.DataSource
 
 val ceDAO = CEDAO(hikarih2ds)
 
+/**
+ * A class that implements DAO
+ * Accesses the CE aspects of the DB
+ *
+ * @param dataSource: A datasource that provides the connection to the database
+ * @property logger: Logger
+ */
 class CEDAO(private val dataSource: DataSource): DAO<Grade> {
     private val logger = LoggerFactory.getLogger("CEDAO")
     override fun create(t: Grade): Grade {
@@ -90,7 +94,6 @@ class CEDAO(private val dataSource: DataSource): DAO<Grade> {
                 }
             }
         }
-        if (ce.isEmpty()) throw StudentEmpty
         return ce
     }
 

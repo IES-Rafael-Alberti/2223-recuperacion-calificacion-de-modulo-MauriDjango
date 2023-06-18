@@ -1,9 +1,8 @@
 package dao
 
 import entities.component.InstrumentComponent
-import entities.component.RAComponent
 import entities.grade.Grade
-import entities.grade.RAGrade
+import entities.grade.InstrumentGrade
 import exceptions.StudentEmpty
 import hikarih2ds
 import org.slf4j.LoggerFactory
@@ -13,6 +12,14 @@ import javax.sql.DataSource
 
 
 val instrumentDAO = InstrumentDAO(hikarih2ds)
+
+/**
+ * A class that implements DAO
+ * Accesses the Instrument aspects of the DB
+ *
+ * @param dataSource: A datasource that provides the connection to the database
+ * @property logger: Logger
+ */
 class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
     private val logger = LoggerFactory.getLogger("InstrumentDAO")
 
@@ -85,19 +92,19 @@ class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
                 val resultSet = stmt.executeQuery()
                 while (resultSet.next()) {
                     instruments.add(
-                        RAGrade(
+                        InstrumentGrade(
                             component = InstrumentComponent(
                                 resultSet.getString("instrumentName"),
                                 resultSet.getDouble("percentage")
                             ),
                             superComponentID = UUID.fromString(resultSet.getString("ceID")),
-                            id = UUID.fromString(resultSet.getString("id"))
+                            id = UUID.fromString(resultSet.getString("id")),
+                            grade = resultSet.getDouble("grade")
                         )
                     )
                 }
             }
         }
-        if (instruments.isEmpty()) throw StudentEmpty
         return instruments
     }
 }
