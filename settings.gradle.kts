@@ -12,5 +12,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = "DAW-Recu-2023"
+rootProject.name = "Recuperacion"
 
