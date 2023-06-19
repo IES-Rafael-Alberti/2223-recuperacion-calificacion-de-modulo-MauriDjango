@@ -31,15 +31,20 @@ object DAOUtilities {
     fun insertDBObjects(students: MutableList<Student>) {
 
         students.forEach { student ->
-            studentDAO.create(student)
+            studentDAO.getById(student)?.let { studentDAO.updateById(student)}?:run {
+                studentDAO.create(student) }
             student.modulos.forEach { modulo ->
-                moduloDAO.create(modulo)
+                moduloDAO.getById(modulo)?.let { moduloDAO.updateById(modulo) }?:run {
+                moduloDAO.create(modulo) }
                 modulo.subComponents.forEach { ra ->
-                    raDAO.create(ra)
+                    raDAO.getById(ra)?.let { raDAO.updateById(ra)}?:run {
+                    raDAO.create(ra) }
                     ra.subComponents.forEach { ce ->
-                        ceDAO.create(ce)
+                        ceDAO.getById(ce)?.let { ceDAO.updateById(ce) }?:run {
+                        ceDAO.create(ce) }
                         ce.subComponents.forEach { instrument ->
-                            instrumentDAO.create(instrument)
+                            instrumentDAO.getById(instrument)?.let { instrumentDAO.updateById(instrument) }?:run {
+                            instrumentDAO.create(instrument) }
                         }
                     }
                 }

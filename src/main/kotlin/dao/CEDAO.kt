@@ -21,6 +21,7 @@ val ceDAO = CEDAO(hikarih2ds)
  */
 class CEDAO(private val dataSource: DataSource): DAO<Grade> {
     private val logger = LoggerFactory.getLogger("CEDAO")
+
     override fun create(t: Grade): Grade {
         try {
             val sql = "INSERT INTO CRITERIOEVALUACION (id, ceName, raID, grade, percentage) VALUES (?, ?, ?, ?, ?)"
@@ -38,6 +39,20 @@ class CEDAO(private val dataSource: DataSource): DAO<Grade> {
             logger.warn(e.message)
         }
         return t
+    }
+
+    override fun updateById(t: Grade): Int {
+        val sql = "UPDATE CRITERIOEVALUACION SET  ceName = ?, raID = ?, grade = ?, percentage = ? WHERE id = ?"
+        return dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.gradeName)
+                stmt.setString(2, t.superComponentID.toString())
+                stmt.setDouble(3, t.getGrade())
+                stmt.setDouble(4, t.component.percentage)
+                stmt.setString(5, t.id.toString())
+                stmt.executeUpdate()
+            }
+        }
     }
 
     override fun createTable() {
@@ -97,11 +112,25 @@ class CEDAO(private val dataSource: DataSource): DAO<Grade> {
         return ce
     }
 
-    override fun updateById(t: Grade): Grade {
-        TODO("Not yet implemented")
-    }
-
-    override fun getById(t: Grade): Grade {
-        TODO("Not yet implemented")
+    override fun getById(t: Grade): Grade? {
+        val sql = "SELECT * FROM CRITERIOEVALUACION WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.id.toString())
+                val resultSet = stmt.executeQuery()
+                if (resultSet.next()) {
+                    return CEGrade(
+                        component = CEComponent(
+                            resultSet.getString("ceName"),
+                            resultSet.getDouble("percentage")
+                        ),
+                        superComponentID = UUID.fromString(resultSet.getString("raID")),
+                        id = UUID.fromString(resultSet.getString("id"))
+                    )
+                } else {
+                    return null
+                }
+            }
+        }
     }
 }

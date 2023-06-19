@@ -96,8 +96,8 @@ class CSVHandler(private val csvFile: File) {
      * @param string: RA name to be matched
      * @return index: Index if found or null if not found
      */
-    private fun findRAIndex(): Int? {
-        val raRegex = Regex("RA(\\d)")
+    private fun findRAGradeIndex(): Int? {
+        val raRegex = Regex("UD\\d+")
         var index: Int? = null
 
         linesList.forEach { line ->
@@ -307,61 +307,26 @@ class CSVHandler(private val csvFile: File) {
      *
      * @param students: List of Students objects
      */
-    fun updateCEGrades(students: MutableList<Student>) {
-        val ra: String? = getRAComponent()?.first
+    private fun updateCEGrades(students: MutableList<Student>, moduloName: String) {
+        val raName: String? = getRAComponent()?.first
         val newLinesList: MutableList<MutableList<String>> = linesList.toMutableList()
-        var matchedRAGrades: Grade? = null
 
         students.forEach { student ->
-            student.modulos.forEach { modulo ->
-                modulo.subComponents.forEach { raGrade ->
-                    if (raGrade.component.name == ra) {
-                        matchedRAGrades = raGrade
-                    }
-                }
-            }
-
             findIndex(student.name)?.let { studentIndex ->
-                matchedRAGrades?.subComponents?.forEach { ce ->
-                    findCEIndex(ce.component.name)?.let { ceIndex ->
-                        newLinesList[ceIndex][studentIndex] = ce.getGrade().toString()
+                student.modulos.find { it.moduloName == moduloName }?.let { modulo ->
+                    modulo.subComponents.find { it.component.name == raName }?.let { raGrade ->
+                        findRAGradeIndex()?.let { raGradeIndex ->
+                            linesList[raGradeIndex][studentIndex] = raGrade.getGrade().toString()
+                            raGrade.subComponents.forEach { ceGrade ->
+                                findCEIndex(ceGrade.component.name)?.let { ceIndex ->
+                                    newLinesList[ceIndex][studentIndex] = ceGrade.getGrade().toString()
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-        linesList.clear()
-        linesList.addAll(newLinesList)
-    }
-
-    /**
-     * Updates linesList property with RA grades of a list of students
-     *
-     * @param students: List of Students objects
-     */
-    fun updateRAGrades(students: MutableList<Student>) {
-        val ra: String? = getRAComponent()?.first
-        val newLinesList: MutableList<MutableList<String>> = linesList.toMutableList()
-        var mathcedRAGrade: Grade? = null
-
-        students.forEach { student ->
-            student.modulos.forEach { modulo ->
-                modulo.subComponents.forEach { raGrade ->
-                    if (raGrade.component.name == ra) {
-                        mathcedRAGrade = raGrade
-                    }
-                }
-            }
-
-            findIndex(student.name)?.let { studentIndex ->
-                mathcedRAGrade?.let {
-                    findRAIndex()?.let { raIndex ->
-                        newLinesList[raIndex][studentIndex] = mathcedRAGrade?.getGrade().toString()
-                    }
-                }
-            }
-        }
-        linesList.clear()
-        linesList.addAll(newLinesList)
     }
 
     /**
@@ -389,12 +354,9 @@ class CSVHandler(private val csvFile: File) {
      *
      * @param students The list of students whose grades need to be updated.
      */
-    fun updateCSVFile(
-        students: MutableList<Student>,
-    ) {
+    fun updateCSVFile(students: MutableList<Student>, moduloName: String) {
 
-        updateCEGrades(students)
-        updateRAGrades(students)
+        updateCEGrades(students, moduloName)
         overwriteFile()
         logger.debug("CSVFile updated")
     }
@@ -403,10 +365,11 @@ class CSVHandler(private val csvFile: File) {
         var studentInitials = ""
         linesList.forEach { line ->
             line.find { it == studentName }?.let {
-                line.indexOf(studentName) }?.let {studentIndex ->
-                    studentInitials = linesList[0][studentIndex]
-                }
+                line.indexOf(studentName)
+            }?.let { studentIndex ->
+                studentInitials = linesList[0][studentIndex]
             }
+        }
         return studentInitials
     }
 }

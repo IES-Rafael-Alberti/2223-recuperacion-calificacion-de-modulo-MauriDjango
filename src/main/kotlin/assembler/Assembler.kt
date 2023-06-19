@@ -6,7 +6,7 @@ package assembler
  *
  * @param T The type of component to assemble.
  */
-abstract class Assembler<T>() {
+abstract class Assembler<T> {
 
     /**
      * Assembles the given component.

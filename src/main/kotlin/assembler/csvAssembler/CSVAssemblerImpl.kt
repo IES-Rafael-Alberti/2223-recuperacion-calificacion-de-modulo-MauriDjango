@@ -14,7 +14,9 @@ import entities.grade.*
 class CSVAssemblerImpl(
     private val connection: CSVDSource,
     private val moduloName: String,
-    private val students: MutableList<Student>) {
+    private val students: MutableList<Student>
+)
+{
     private val csvStudentAssembler = CSVStudentAssembler(connection)
     private val csvModuloAssembler = CSVModuloAssembler(moduloName)
     private val csvRAAssembler = CSVRAAssemblerStudent(connection)

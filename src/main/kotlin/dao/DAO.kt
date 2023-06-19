@@ -25,7 +25,7 @@ interface DAO<T> {
      * @param t: Generic Type
      * @return t: Generic Type
      */
-    fun getById(t: T):T
+    fun getById(t: T): T?
 
     /**
      * Updates an entity in the database with values from an object
@@ -33,7 +33,7 @@ interface DAO<T> {
      * @param t: Generic Type
      * @return t: Generic Type
      */
-    fun updateById(t: T):T
+    fun updateById(t: T): Int
 
     /**
      * Deletes an entity from the database that matches with an object

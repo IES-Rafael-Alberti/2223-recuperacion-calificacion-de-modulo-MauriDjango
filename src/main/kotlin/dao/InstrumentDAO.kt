@@ -1,8 +1,10 @@
 package dao
 
 import entities.component.InstrumentComponent
+import entities.component.ModuloComponent
 import entities.grade.Grade
 import entities.grade.InstrumentGrade
+import entities.grade.Modulo
 import hikarih2ds
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
@@ -47,7 +49,7 @@ class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
                 "CREATE TABLE INSTRUMENT (id VARCHAR(50) PRIMARY KEY, instrumentName VARCHAR(50), ceID VARCHAR(50), grade DOUBLE, percentage DOUBLE);"
             dataSource.connection.use { conn ->
                 conn.prepareStatement(sql).use { stmt ->
-                    val result = stmt.executeUpdate()
+                    stmt.executeUpdate()
                 }
             }
         } catch (e: SQLException) {
@@ -55,12 +57,41 @@ class InstrumentDAO(private val dataSource: DataSource): DAO<Grade> {
         }
     }
 
-    override fun getById(t: Grade): Grade {
-        TODO("Not yet implemented")
+    override fun getById(t: Grade): Grade? {
+        val sql = "SELECT * FROM INSTRUMENT WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.id.toString())
+                val resultSet = stmt.executeQuery()
+                if (resultSet.next()) {
+                    return InstrumentGrade(
+                        component = InstrumentComponent(
+                            resultSet.getString("instrumentName"),
+                            resultSet.getDouble("percentage")
+                        ),
+                        superComponentID = UUID.fromString(resultSet.getString("ceID")),
+                        id = UUID.fromString(resultSet.getString("id")),
+                        grade = resultSet.getDouble("grade")
+                    )
+                } else {
+                    return null
+                }
+            }
+        }
     }
 
-    override fun updateById(t: Grade): Grade {
-        TODO("Not yet implemented")
+    override fun updateById(t: Grade): Int {
+        val sql = "UPDATE INSTRUMENT SET  instrumentName = ?, ceID = ?, grade = ?, percentage = ? WHERE id = ?"
+        return dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.gradeName)
+                stmt.setString(2, t.superComponentID.toString())
+                stmt.setDouble(3, t.getGrade())
+                stmt.setDouble(4, t.component.percentage)
+                stmt.setString(5, t.id.toString())
+                stmt.executeUpdate()
+            }
+        }
     }
 
     override fun deleteById(t: Grade): Grade {

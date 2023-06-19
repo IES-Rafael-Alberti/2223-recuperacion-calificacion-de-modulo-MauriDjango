@@ -99,12 +99,39 @@ class RADAO(private val dataSource: DataSource): DAO<Grade> {
         return ra
     }
 
-    override fun updateById(t: Grade): Grade {
-        TODO("Not yet implemented")
+    override fun updateById(t: Grade): Int {
+        val sql = "UPDATE RESULTADOAPRENDIZAJE SET  raName = ?, moduloID = ?, grade = ?, percentage = ? WHERE id = ?"
+        return dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.gradeName)
+                stmt.setString(2, t.superComponentID.toString())
+                stmt.setDouble(3, t.getGrade())
+                stmt.setDouble(4, t.component.percentage)
+                stmt.setString(5, t.id.toString())
+                stmt.executeUpdate()
+            }
+        }
     }
 
-    override fun getById(t: Grade): Grade {
-        TODO("Not yet implemented")
+    override fun getById(t: Grade): Grade? {
+        val sql = "SELECT * FROM RESULTADOAPRENDIZAJE WHERE id = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, t.id.toString())
+                val resultSet = stmt.executeQuery()
+                if (resultSet.next()) {
+                    return RAGrade(
+                        component = RAComponent(
+                            resultSet.getString("raName"),
+                            resultSet.getDouble("percentage")
+                        ),
+                        superComponentID = UUID.fromString(resultSet.getString("moduloID")),
+                        id = UUID.fromString(resultSet.getString("id"))
+                    )
+                } else {
+                    return null
+                }
+            }
+        }
     }
-
 }

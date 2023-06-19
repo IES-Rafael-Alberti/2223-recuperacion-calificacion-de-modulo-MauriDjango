@@ -50,6 +50,6 @@ class CSVDSource(connection: csv.CSVHandler): DSource<csv.CSVHandler>(connection
 
     fun getStudentInitials(studentName: String): String = connection.getStudentInitials(studentName)
 
-    fun updateCSV(students: MutableList<Student>) = connection.updateCSVFile(students)
+    fun updateCSV(students: MutableList<Student>, moduloName: String) = connection.updateCSVFile(students, moduloName)
 }
 
