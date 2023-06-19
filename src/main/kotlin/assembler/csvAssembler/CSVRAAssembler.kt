@@ -12,7 +12,7 @@ import entities.grade.RAGrade
  *
  * @property connection The CSVDSource connection for retrieving CSV data.
  */
-class CSVRAAssemblerStudent(private val connection: CSVDSource): Assembler<Modulo>() {
+class CSVRAAssembler(private val connection: CSVDSource): Assembler<Modulo>() {
 
     /**
      * Assembles CSV data for the RA component of the specified Modulo.

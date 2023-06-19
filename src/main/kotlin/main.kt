@@ -3,7 +3,7 @@ import csv.CSVHandler
 import csv.getCSVFiles
 import display.Display
 import entities.grade.Student
-import utilities.MainArgs
+import mainUtil.MainArgs
 import org.slf4j.LoggerFactory
 import dao.DAOUtilities
 import dataSource.CSVDSource
@@ -38,10 +38,10 @@ fun main(args: Array<String>) {
         CSVHandler(csvFile).let {csvHandler ->
             CSVDSource(csvHandler).let { csvDSource ->
                 csvDSources.add(csvDSource)
+                logger.debug("CSVDSource created")
             }
         }
     }
-    logger.debug("CSVReaders created")
 
     //This next part of database accessing is done regardless if the db option has been selected or not
     //to avoid unnecessarily creating multiple instances of the same object
@@ -76,6 +76,3 @@ fun main(args: Array<String>) {
         }
     }
 }
-
-
-

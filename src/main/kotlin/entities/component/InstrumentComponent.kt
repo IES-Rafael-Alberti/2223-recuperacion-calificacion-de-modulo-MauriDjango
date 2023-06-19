@@ -9,4 +9,3 @@ package entities.component
  * @param percentage The weightage or percentage of the instrument component.
  */
 class InstrumentComponent(name: String, percentage: Double) : Component(name, percentage)
-

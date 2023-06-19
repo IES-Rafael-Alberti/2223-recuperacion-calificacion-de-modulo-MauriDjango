@@ -48,8 +48,19 @@ class CSVDSource(connection: csv.CSVHandler): DSource<csv.CSVHandler>(connection
      */
     fun getInstrumentGrade(studentName: String, component: Component) = connection.getInstrumentGrade(studentName, component)
 
+    /**
+     * Retrieves the initials of a student based on their full name.
+     *
+     * @param studentName The full name of the student.
+     * @return The initials of the student.
+     */
     fun getStudentInitials(studentName: String): String = connection.getStudentInitials(studentName)
 
+    /**
+     * Updates the CSV file with the data of the provided students for a specific modulo.
+     *
+     * @param students The list of students to update in the CSV file.
+     * @param moduloName The name of the modulo for which the students' data is being updated.
+     */
     fun updateCSV(students: MutableList<Student>, moduloName: String) = connection.updateCSVFile(students, moduloName)
 }
-

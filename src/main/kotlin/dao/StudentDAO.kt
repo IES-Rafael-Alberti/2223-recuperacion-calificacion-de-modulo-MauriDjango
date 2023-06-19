@@ -1,14 +1,9 @@
 package dao
 
-import entities.component.RAComponent
-import entities.grade.Grade
-import entities.grade.RAGrade
+
 import entities.grade.Student
-import exceptions.StudentEmpty
 import hikarih2ds
-import org.h2.message.DbException
 import org.slf4j.LoggerFactory
-import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*
 import javax.sql.DataSource
@@ -128,4 +123,3 @@ class StudentDAO(private val dataSource: DataSource): DAO<Student> {
         }
     }
 }
-

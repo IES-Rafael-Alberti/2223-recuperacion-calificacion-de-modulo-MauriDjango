@@ -130,6 +130,4 @@ class ModuloDAO(private val dataSource: DataSource): DAO<Grade> {
             }
         }
     }
-
-
 }

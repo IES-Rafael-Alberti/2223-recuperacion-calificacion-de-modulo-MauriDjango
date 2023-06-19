@@ -7,6 +7,4 @@ package dataSource
  * @param connection The connection object used for data retrieval.
  * @param T The type of the connection object.
  */
-abstract class DSource<T>(val connection: T) {
-}
-
+abstract class DSource<T>(val connection: T)

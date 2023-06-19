@@ -16,5 +16,3 @@ class CEGrade(
     superComponentID: UUID,
     id: UUID = UUID.randomUUID()
 ) : Grade(component, superComponentID, id)
-
-

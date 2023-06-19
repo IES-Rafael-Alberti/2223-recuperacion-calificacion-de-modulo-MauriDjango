@@ -1,10 +1,7 @@
-package utilities
+package mainUtil
 
-import entities.grade.Student
-import exceptions.GetDBOptionError
 import exceptions.NoPathFound
 import org.slf4j.LoggerFactory
-import dao.DAOUtilities
 
 const val moduloArgument = "-mo"
 const val pathArgument = "-pi"
@@ -70,47 +67,5 @@ object MainArgs {
         }
         return option
     }
-    /*    fun getDB(): Int {
-        var option = 0
-        try {
-            if (dbArgument in args) {
-                generateTables()
-                option = 1
-                if (args[args.indexOf(dbArgument) + 1] == "d") {
-                    option = 2
-                    getDBOption(option = option)
-                }
-                if (args[args.indexOf(dbArgument) + 1] == "q") {
-                    option = 3
-                    getDBOption(option = option)
-                }
-            }
-        } catch (e: IndexOutOfBoundsException) {
-            logger.warn(e.message)
-        }
-        return option
-    }*/
-
-
-    fun getDBOption(option: Int, students: MutableList<Student>? = null): MutableList<Student>? {
-
-        return when (option) {
-            1 -> {
-                students?.let { DAOUtilities.insertDBObjects(it)}
-                return null
-            }
-            2 -> {
-                DAOUtilities.deleteAll()
-                return null
-            }
-            3 -> DAOUtilities.retrieveDBObjects()
-            else -> {throw GetDBOptionError
-            }
-        }
-    }
-
-
-
-
 }
 

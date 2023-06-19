@@ -1,0 +1,29 @@
+<component name="ArtifactManager">
+  <artifact name="Recuperacion:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Recuperacion_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Recuperacion.jar">
+        <element id="module-output" name="Recuperacion.main" />
+      </element>
+      <element id="library" level="project" name="Gradle: com.h2database:h2:2.1.214" />
+      <element id="library" level="project" name="Gradle: org.junit.platform:junit-platform-engine:1.6.0" />
+      <element id="library" level="project" name="Gradle: com.zaxxer:HikariCP:5.0.1" />
+      <element id="library" level="project" name="Gradle: org.slf4j:slf4j-api:2.0.4" />
+      <element id="library" level="project" name="Gradle: org.jetbrains:annotations:13.0" />
+      <element id="library" level="project" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.6.0" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.6.10" />
+      <element id="library" level="project" name="Gradle: org.apiguardian:apiguardian-api:1.1.0" />
+      <element id="library" level="project" name="Gradle: ch.qos.logback:logback-core:1.4.5" />
+      <element id="library" level="project" name="Gradle: org.junit.platform:junit-platform-commons:1.6.0" />
+      <element id="library" level="project" name="Gradle: ch.qos.logback:logback-classic:1.4.5" />
+      <element id="library" level="project" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.6.0" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-test:1.5.21" />
+      <element id="library" level="project" name="Gradle: org.opentest4j:opentest4j:1.2.0" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.10" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.6.10" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-test-junit5:1.5.21" />
+      <element id="library" level="project" name="Gradle: de.m3y.kformat:kformat:0.9" />
+      <element id="library" level="project" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.10" />
+    </root>
+  </artifact>
+</component>

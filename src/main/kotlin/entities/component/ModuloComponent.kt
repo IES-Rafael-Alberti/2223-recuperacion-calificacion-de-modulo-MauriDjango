@@ -8,5 +8,4 @@ package entities.component
  * @param moduloName The name of the Modulo associated with the ModuloComponent.
  * @param percentage The weightage or percentage of the ModuloComponent (default: 100.00).
  */
-class ModuloComponent(moduloName: String, percentage: Double = 100.00) : Component(moduloName, percentage) {
-}
+class ModuloComponent(moduloName: String, percentage: Double = 100.00) : Component(moduloName, percentage)

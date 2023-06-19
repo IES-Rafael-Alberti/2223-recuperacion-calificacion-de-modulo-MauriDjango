@@ -19,7 +19,7 @@ class CSVAssemblerImpl(
 {
     private val csvStudentAssembler = CSVStudentAssembler(connection)
     private val csvModuloAssembler = CSVModuloAssembler(moduloName)
-    private val csvRAAssembler = CSVRAAssemblerStudent(connection)
+    private val csvRAAssembler = CSVRAAssembler(connection)
     private val csvCEAssembler = CSVCEAssembler(connection)
     private val csvInstrumentAssembler = CSVInstrumentAssembler(connection)
 

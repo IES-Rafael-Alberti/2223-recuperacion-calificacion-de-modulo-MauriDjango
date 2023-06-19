@@ -2,7 +2,6 @@ package csv
 
 import bingo.inputoutput.exceptions.FileEmpty
 import entities.component.Component
-import entities.grade.Grade
 import entities.grade.Student
 import exceptions.*
 import org.slf4j.LoggerFactory
@@ -42,8 +41,6 @@ class CSVHandler(private val csvFile: File) {
         cePercentIndex = findIndex("%CE")?.plus(1)
         gradeSectionIndex = findIndex("%RA")?.plus(1)
         raPercentage = getRAPercentage()
-
-
     }
 
     /**
@@ -56,7 +53,7 @@ class CSVHandler(private val csvFile: File) {
      private fun findIndex(string: String): Int? {
         var index: Int? = null
 
-        linesList.forEach() {list ->
+        linesList.forEach {list ->
             list.indexOf(string).let {
                 if (it > -1) {
                     index = it
@@ -93,7 +90,6 @@ class CSVHandler(private val csvFile: File) {
     /**
      * Finds the index for the Resultado de Aprendizaje "RA" row
      *
-     * @param string: RA name to be matched
      * @return index: Index if found or null if not found
      */
     private fun findRAGradeIndex(): Int? {
@@ -122,7 +118,7 @@ class CSVHandler(private val csvFile: File) {
         val string = StringBuilder()
         var quotesOpen = false
 
-        lines.forEach() { line ->
+        lines.forEach { line ->
             line.forEach { char ->
                 if (char == ',' && !quotesOpen) {
                     lineListed.add(string.toString())
@@ -148,17 +144,22 @@ class CSVHandler(private val csvFile: File) {
      * @return studentList: List of student's names
      */
     fun getStudents(): MutableList<String> {
-        val studentList = mutableListOf<String>()
-        val firstStudentIndex: Int?
+        val lines = linesList.toMutableList()
+        val studentNames: MutableList<String> = mutableListOf()
 
-        firstStudentIndex = lines[0].split(',').indexOfFirst { it != "" }
-
-        lines[1].split(',').drop(firstStudentIndex).forEach() {
-            if (it != ",") studentList.add(it)
+        lines[0].indexOfFirst { it != "" }.let { firstNameIndex ->
+            if (firstNameIndex > -1) {
+                lines[1].drop(firstNameIndex).let { names ->
+                    names.forEach { name ->
+                        if (name != "") {
+                            studentNames.add(name)
+                        }
+                    }
+                }
+            }
         }
-
-        if (studentList.isEmpty()) throw StudentsNotFound
-        return studentList
+        if (studentNames.isEmpty()) throw StudentsNotFound
+        return studentNames
     }
 
     /**
@@ -167,7 +168,7 @@ class CSVHandler(private val csvFile: File) {
      * @return ra: Pair<name: String, percentage: String>
      */
     fun getRAComponent(): Pair<String, Double>? {
-        val raRegex = Regex("RA(\\d)")
+        val raRegex = Regex("RA(\\d+)")
         var ra: Pair<String, Double>? = null
 
         linesList.forEach { line ->
@@ -207,7 +208,7 @@ class CSVHandler(private val csvFile: File) {
                 }
             }
         }
-        percentage?: {throw NoRAPercentFound }
+        percentage?:run { throw NoRAPercentFound }
         return percentage
     }
 
@@ -221,8 +222,8 @@ class CSVHandler(private val csvFile: File) {
         val ceList: MutableList<Pair<String, String>> = mutableListOf()
 
         try {
-            linesList.forEach() { line ->
-                line.forEach() { element ->
+            linesList.forEach { line ->
+                line.forEach { element ->
                     ceRegex.find(element)?.let {
                         cePercentIndex?.let { percent ->
                             ceList.add(
@@ -248,12 +249,12 @@ class CSVHandler(private val csvFile: File) {
      * @return instruments: List of Pair<name: String, percentage: String>
      */
     fun getInstrumentComponents(): MutableList<Pair<String, String>> {
-        val instrumentRegex = Regex("([a-z],[a-z])")
+        val instrumentRegex = Regex("([a-z,?]+)")
         val instruments = mutableListOf<Pair<String, String>>()
 
                     linesList.forEach { line ->
-                        line.forEach { element ->
-                            instrumentRegex.find(element)?.let { instMatch ->
+                        line[1].let { element ->
+                            instrumentRegex.matchEntire(element)?.let {
                                 raPercentIndex?.let { percentIndex ->
                                     instruments.add(
                                         Pair(
@@ -265,9 +266,6 @@ class CSVHandler(private val csvFile: File) {
                             }
                         }
                     }
-
-
-
         if (instruments.isEmpty()) {
             throw InstrumentComponentsEmpty
         }
@@ -283,11 +281,11 @@ class CSVHandler(private val csvFile: File) {
      */
     fun getInstrumentGrade(studentName: String, component: Component): String? {
         var grade: String? = null
-        val instrumentRegex = Regex("([a-z],[a-z])")
+        val instrumentRegex = Regex("([a-z,?]+)")
 
         linesList.forEach { line ->
-            line.forEach { element ->
-                instrumentRegex.find(element)?.let {
+            line[1].let { element ->
+                instrumentRegex.matchEntire(element)?.let {
                     findIndex(studentName)?.let { studentIndex ->
                         if (component.name == "${element}${linesList.indexOf(line)}") {
                             grade = line[studentIndex]
@@ -361,6 +359,12 @@ class CSVHandler(private val csvFile: File) {
         logger.debug("CSVFile updated")
     }
 
+    /**
+     * Retrieves the initials of a student based on their name.
+     *
+     * @param studentName The name of the student.
+     * @return The initials of the student.
+     */
     fun getStudentInitials(studentName: String): String {
         var studentInitials = ""
         linesList.forEach { line ->

@@ -43,5 +43,3 @@ class CSVStudentAssembler(private val connection: CSVDSource): Assembler<Student
         if (students.isEmpty()) throw StudentEmpty
     }
 }
-
-
